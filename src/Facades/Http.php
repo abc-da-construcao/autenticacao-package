@@ -6,7 +6,8 @@ use AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService login()
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService loginRequest(string $username, string $password)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService validateTokenRequest(string $tokenTipo, string $token)
  *
  * @see AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService
  */

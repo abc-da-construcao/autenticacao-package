@@ -10,7 +10,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getTokenTipo()
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getTokenValidade()
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getPayload($token = null)
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getUser()
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getUser($token = null)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService validate(string $tokenTipo = null, string $token = null)
  *
  * @see AbcDaConstrucao\AutorizacaoCliente\Services\JWTService
  */

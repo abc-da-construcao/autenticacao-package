@@ -2,6 +2,7 @@
 
 namespace AbcDaConstrucao\AutorizacaoCliente\Services;
 
+use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
@@ -18,7 +19,7 @@ class JWTService
     /**
      * @return mixed
      */
-    public function getTokenTipo()
+    public function getTokenType()
     {
         return Cache::get(Config::get('autorizacao.cache.token_tipo'));
     }
@@ -31,7 +32,18 @@ class JWTService
         return Cache::get(Config::get('autorizacao.cache.token_validade'));
     }
 
+    public function validate(string $tokenTipo = null, string $token = null)
+    {
+        $tokenTipo = $tokenTipo ?? $this->getTokenType();
+        $token = $token ?? $this->getToken();
 
+        return Http::validateTokenRequest($tokenTipo, $token);
+    }
+
+    /**
+     * @param $token
+     * @return mixed|null
+     */
     public function getPayload($token = null)
     {
         $token = $token ?? $this->getToken();
@@ -49,9 +61,12 @@ class JWTService
         return json_decode(base64_decode($splitToken[1]), true);
     }
 
-    public function getUser()
+    /**
+     * @return mixed|null
+     */
+    public function getUser($token = null)
     {
-        $payload = $this->getPayload();
+        $payload = $this->getPayload($token);
 
         return $payload['user'] ?? null;
     }

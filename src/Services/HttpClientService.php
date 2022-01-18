@@ -63,7 +63,7 @@ class HttpClientService
      * @return mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function login(string $username, string $password)
+    public function loginRequest(string $username, string $password)
     {
         try {
             $resp = $this->guzzle->request('POST', 'api/auth/login', [
@@ -88,10 +88,16 @@ class HttpClientService
         }
     }
 
-    public function tokenValidate(string $tokenTipo, string $token)
+    /**
+     * @param string $tokenTipo
+     * @param string $token
+     * @return bool
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function validateTokenRequest(string $tokenTipo, string $token)
     {
         try {
-            $resp = $this->guzzle->request('POST', 'api/user/check', [
+            $resp = $this->guzzle->request('POST', 'api/auth/validate', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}"
                 ],
