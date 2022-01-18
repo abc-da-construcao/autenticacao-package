@@ -11,7 +11,7 @@ use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Http\Request;
 use Illuminate\Support\ServiceProvider;
 
-class LaravelServiceProvider extends ServiceProvider implements DeferrableProvider
+class AutorizacaoServiceProvider extends ServiceProvider implements DeferrableProvider
 {
     /**
      * Boot the authentication services for the application.
@@ -23,6 +23,8 @@ class LaravelServiceProvider extends ServiceProvider implements DeferrableProvid
         $configPath = __DIR__ . '/../../config/autorizacao.php';
         $this->mergeConfigFrom($configPath, 'autorizacao');
         $this->publishes([$configPath => config_path('acl.php')], 'autorizacao:config');
+
+        $this->registerAuthGuard();
     }
 
     /**
@@ -51,26 +53,22 @@ class LaravelServiceProvider extends ServiceProvider implements DeferrableProvid
         return [Http::class, JWT::class];
     }
 
-    protected function driverAuthRegister()
+    protected function registerAuthGuard()
     {
         $this->app['auth']->viaRequest('jwt', function (Request $request) {
             if (empty($request->header('Authorization'))) {
                 return null;
             }
+
             $tokenSplit = explode(' ', $request->header('Authorization'));
 
-            $resp = Http::login('talles.gazel', 'asfsadfasd');
+            if (!JWT::validate($tokenSplit[0], $tokenSplit[1])) {
+                return null;
+            }
 
-            $user = JWT::getPayload($tokenSplit[1]);
+            $user = JWT::getUser($tokenSplit[1]);
 
             return new GenericUser($user);
         });
-    }
-
-    public function login($request)
-    {
-        $resp = Http::login('talles.gazel', 'asfsadfasd');
-
-        return redirect();
     }
 }
