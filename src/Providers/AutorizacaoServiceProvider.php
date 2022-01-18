@@ -56,17 +56,20 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
     protected function registerAuthGuard()
     {
         $this->app['auth']->viaRequest('jwt', function (Request $request) {
-            if (empty($request->header('Authorization'))) {
+            $tokenTipo = null;
+            $token = null;
+
+            if ($request->header('Authorization')) {
+                $tokenSplit = explode(' ', $request->header('Authorization'));
+                $tokenTipo = $tokenSplit[0];
+                $token = $tokenSplit[1];
+            }
+
+            if (!JWT::validate($tokenTipo, $token)) {
                 return null;
             }
 
-            $tokenSplit = explode(' ', $request->header('Authorization'));
-
-            if (!JWT::validate($tokenSplit[0], $tokenSplit[1])) {
-                return null;
-            }
-
-            $user = JWT::getUser($tokenSplit[1]);
+            $user = JWT::getUser($token);
 
             return new GenericUser($user);
         });

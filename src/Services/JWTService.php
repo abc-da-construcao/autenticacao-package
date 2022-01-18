@@ -32,6 +32,11 @@ class JWTService
         return Cache::get(Config::get('autorizacao.cache.token_validade'));
     }
 
+    /**
+     * @param string|null $tokenTipo
+     * @param string|null $token
+     * @return bool
+     */
     public function validate(string $tokenTipo = null, string $token = null)
     {
         $tokenTipo = $tokenTipo ?? $this->getTokenType();
