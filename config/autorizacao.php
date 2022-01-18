@@ -2,7 +2,7 @@
 
 return [
     // ID de cadastro da aplicação na API de Autorização.
-    'app_id' => 1,
+    'app_id' => env('AUTORIZACAO_APP_ID'),
 
     // Chaves usadas no Cache para guardar dados do token
     'cache' => [
@@ -14,7 +14,7 @@ return [
     /*
      * Configurações de requisição para API de Autorização.
      */
-    'base_url' => 'http://localhost:8000',
+    'base_url' => env('AUTORIZACAO_URL','http://localhost:8000'),
     'connect_timeout' => 10,
     'timeout' => 30,
 ];
