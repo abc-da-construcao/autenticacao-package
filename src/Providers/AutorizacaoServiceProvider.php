@@ -64,7 +64,7 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
                 $tokenTipo = $tokenSplit[0];
                 $token = $tokenSplit[1];
             }
-
+            dd($tokenTipo, $token);
             if (!JWT::validate($tokenTipo, $token)) {
                 return null;
             }
