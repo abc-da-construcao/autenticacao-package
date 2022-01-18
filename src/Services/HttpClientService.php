@@ -51,10 +51,7 @@ class HttpClientService
             $contents = json_decode($e->getResponse()->getBody()->getContents(), true);
         }
 
-        return [
-            'success' => 'false',
-            'data' => $contents,
-        ];
+        return $contents;
     }
 
     /**
@@ -79,10 +76,7 @@ class HttpClientService
             Cache::add(Config::get('autorizacao.cache.token_validade'), $body['token_validade']);
             Cache::add(Config::get('autorizacao.cache.token'), $body['token']);
 
-            return [
-                'success' => 'true',
-                'data' => $body
-            ];
+            return $body;
         } catch (\Exception $e) {
             return $this->errorHandler($e);
         }
@@ -97,7 +91,7 @@ class HttpClientService
     public function validateTokenRequest(string $tokenTipo, string $token)
     {
         try {
-            $resp = $this->guzzle->request('POST', 'api/auth/validate', [
+            $resp = $this->guzzle->request('POST', 'api/auth/check', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}"
                 ],
