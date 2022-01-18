@@ -22,5 +22,16 @@
         "illuminate/support": "^5.2|^6|^7|^8"
     },
     "minimum-stability": "dev",
-    "prefer-stable": true
+    "prefer-stable": true,
+    "extra": {
+        "laravel": {
+            "aliases": {
+                "Http": "AbcDaConstrucao\\AutorizacaoCliente\\Facades\\Http",
+                "JWT": "AbcDaConstrucao\\AutorizacaoCliente\\Facades\\JWT"
+            },
+            "providers": [
+                "AbcDaConstrucao\\AutorizacaoCliente\\Providers\\AutorizacaoServiceProvider"
+            ]
+        }
+    }
 }
