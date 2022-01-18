@@ -22,7 +22,7 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
     {
         $configPath = __DIR__ . '/../../config/autorizacao.php';
         $this->mergeConfigFrom($configPath, 'autorizacao');
-        $this->publishes([$configPath => config_path('acl.php')], 'autorizacao:config');
+        $this->publishes([$configPath => $this->app->configPath('autorizacao.php')], 'autorizacao:config');
 
         $this->registerAuthGuard();
     }
