@@ -128,3 +128,13 @@ $app->routeMiddleware([
 
 $app->register(AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServiceProvider::class);
 ```
+
+<br/>
+
+### Modos de uso da Autenticação
+Em breve
+
+<br/>
+
+### Modos de uso do ACL
+Em breve
