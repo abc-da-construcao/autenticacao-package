@@ -12,9 +12,9 @@
 
 ## Instalação
 Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
-```JSON
+```
 {
-  ......
+  //...
   "repositories": [
     {
       "type": "vcs",
@@ -22,7 +22,7 @@ Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
     }
   ],
   "require": {
-    .....
+    //...
     "abc-da-construcao/autorizacao-package-client": "dev-main"
   }
 }
@@ -60,7 +60,7 @@ Abra o arquivo `config/auth.php` e altere o driver de autenticação para `jwt` 
 as linhas correspondentes ao `provider`.
 
 ```PHP
-//...........
+//...
 'guards' => [
     'web' => [
         'driver' => 'jwt',
@@ -71,7 +71,7 @@ as linhas correspondentes ao `provider`.
         //'provider' => 'users',
     ],
 ]
-// ............
+//...
 ```
 
 <br/>
