@@ -10,7 +10,7 @@
 
 <br/>
 
-### Instalação
+## Instalação
 Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
 ```JSON
 {
