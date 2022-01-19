@@ -70,7 +70,7 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
 
             $user = JWT::getUser($token);
 
-            return new GenericUser($user);
+            return new GenericUser($user ?? []);
         });
     }
 }
