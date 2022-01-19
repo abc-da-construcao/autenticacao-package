@@ -1,4 +1,14 @@
-## Pacote de recursos Laravel e Lumen para auxiliar na implementação da Autorização ABC.
+### Pacote de recursos Laravel e Lumen para auxiliar na implementação da Autorização ABC.
+
+- [**Instalação**](#Instalação)
+- [**Configuração**](#Configuração)
+  - [**Geral**](#Geral)
+  - [**Laravel**](#Laravel)
+  - [**Lumen**](#Lumen)
+- [**Autenticação**](#Autenticação)
+- [**ACL**](#ACL)
+
+<br/>
 
 ### Instalação
 Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
@@ -23,7 +33,9 @@ composer update abc-da-construcao/autorizacao-package-client
 
 <br/>
 
-### Configuração
+## Configuração
+
+### Geral
 Atualizar as chaves no arquivo `.env` do seu projeto conforme cadastro na API de Autorização.
 ```shell
 APP_NAME="api_pedidos-production"
@@ -32,7 +44,7 @@ APP_KEY=adsfdfkje3453271023sfsewrwperivx
 
 <br/>
 
-#### Laravel
+### Laravel
 Use o seguinte comando para publicar o arquivo de configuração
 
 ```shell
@@ -57,8 +69,8 @@ as linhas correspondentes ao `provider`.
 
 <br/>
 
-#### Lumen
-Copie os seguintes arquivos para o diretório `config` do seu projeto. Caso o diretório não exita crie-o. <br/>
+### Lumen
+Copie os seguintes arquivos para o diretório `config` do seu projeto. Crie o diretório caso não exista. <br/>
 > vendor/abc-da-construcao/autorizacao-package-client/config/autorizacao.php <br/>
 vendor/laravel/lumen-framework/config/auth.php <br/>
 
@@ -131,10 +143,10 @@ $app->register(AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServicePr
 
 <br/>
 
-### Modos de uso da Autenticação
+## Autenticação
 Em breve
 
 <br/>
 
-### Modos de uso do ACL
+## ACL
 Em breve
