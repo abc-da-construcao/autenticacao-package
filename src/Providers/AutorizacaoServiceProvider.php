@@ -20,10 +20,9 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
      */
     public function boot()
     {
-        $configPath = __DIR__ . '/../../config/autorizacao.php';
-        $this->mergeConfigFrom($configPath, 'autorizacao');
-        $this->publishes([$configPath => $this->app->configPath('autorizacao.php')], 'autorizacao:config');
-
+        $path = __DIR__ . '/../../config/autorizacao.php';
+        $this->mergeConfigFrom($path, 'autorizacao');
+        $this->publishes([$path => $this->app->configPath('autorizacao.php')], 'autorizacao:config');
         $this->registerAuthGuard();
     }
 
@@ -56,15 +55,15 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
     protected function registerAuthGuard()
     {
         $this->app['auth']->viaRequest('jwt', function (Request $request) {
-            $tokenTipo = null;
-            $token = null;
+            $tokenTipo = JWT::getTokenType();
+            $token = JWT::getToken();
 
             if ($request->header('Authorization')) {
                 $tokenSplit = explode(' ', $request->header('Authorization'));
                 $tokenTipo = $tokenSplit[0];
                 $token = $tokenSplit[1];
             }
-            dd($tokenTipo, $token);
+
             if (!JWT::validate($tokenTipo, $token)) {
                 return null;
             }
