@@ -79,7 +79,7 @@ as linhas correspondentes ao `provider`.
 
 ### Lumen
 Copie os seguintes arquivos para o diretório `config` do seu projeto. Crie o diretório caso não exista. <br/>
-> vendor/abc-da-construcao/autorizacao-package-client/config/autorizacao.php <br/>
+> vendor/abc-da-construcao/autorizacao-package-client/config/autorizacao_abc.php <br/>
 vendor/laravel/lumen-framework/config/auth.php <br/>
 
 
@@ -118,7 +118,7 @@ $app->withFacades();
 */
 
 $app->configure('auth');
-$app->configure('autorizacao');
+$app->configure('autorizacao_abc');
 
 /*
 |--------------------------------------------------------------------------

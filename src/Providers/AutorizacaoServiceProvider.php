@@ -20,9 +20,9 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
      */
     public function boot()
     {
-        $path = __DIR__ . '/../../config/autorizacao.php';
-        $this->mergeConfigFrom($path, 'autorizacao');
-        $this->publishes([$path => $this->app->configPath('autorizacao.php')], 'autorizacao:config');
+        $path = __DIR__ . '/../../config/autorizacao_abc.php';
+        $this->mergeConfigFrom($path, 'autorizacao_abc');
+        $this->publishes([$path => $this->app->configPath('autorizacao_abc.php')], 'autorizacao_abc:config');
         $this->registerAuthGuard();
     }
 
