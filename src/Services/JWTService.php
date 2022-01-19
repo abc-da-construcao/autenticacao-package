@@ -13,7 +13,7 @@ class JWTService
      */
     public function getToken()
     {
-        return Cache::get(Config::get('autorizacao.cache.token'));
+        return Cache::get(Config::get('autorizacao_abc.cache.token'));
     }
 
     /**
@@ -21,7 +21,7 @@ class JWTService
      */
     public function getTokenType()
     {
-        return Cache::get(Config::get('autorizacao.cache.token_tipo'));
+        return Cache::get(Config::get('autorizacao_abc.cache.token_tipo'));
     }
 
     /**
@@ -29,7 +29,7 @@ class JWTService
      */
     public function getTokenValidade()
     {
-        return Cache::get(Config::get('autorizacao.cache.token_validade'));
+        return Cache::get(Config::get('autorizacao_abc.cache.token_validade'));
     }
 
     /**

@@ -9,10 +9,12 @@ use Illuminate\Support\Facades\Config;
 
 class HttpClientService
 {
+    protected $config;
     protected Client $guzzle;
 
     public function __construct()
     {
+        $this->config = Config::get('autorizacao_abc');
         $this->setGuzzle();
     }
 
@@ -21,7 +23,7 @@ class HttpClientService
      */
     protected function setGuzzle()
     {
-        $url = Config::get('autorizacao.base_url');
+        $url = $this->config['base_url'];
 
         if ('/' != substr($url, -1)) {
             $url = $url . '/';
@@ -29,8 +31,8 @@ class HttpClientService
 
         $this->guzzle = new Client([
             'base_uri' => $url,
-            'connect_timeout' => Config::get('autorizacao.connect_timeout'),
-            'timeout' => Config::get('autorizacao.timeout'),
+            'connect_timeout' => $this->config['connect_timeout'],
+            'timeout' => $this->config['timeout'],
             'verify' => false,
             'headers' => [
                 'Content-Type' => 'application/json; charset=utf-8',
@@ -72,9 +74,15 @@ class HttpClientService
 
             $body = json_decode($resp->getBody()->getContents(), true);
 
-            Cache::put(Config::get('autorizacao.cache.token_tipo'), $body['token_tipo']);
-            Cache::put(Config::get('autorizacao.cache.token_validade'), $body['token_validade']);
-            Cache::put(Config::get('autorizacao.cache.token'), $body['token']);
+            if ($this->config['cache']['ativo'] == true) {
+                Cache::put($this->config['cache']['token_tipo'], $body['token_tipo']);
+                Cache::put($this->config['cache']['token_validade'], $body['token_validade']);
+                Cache::put($this->config['cache']['token'], $body['token']);
+            } elseif (Cache::has($this->config['cache']['token'])) {
+                Cache::forget($this->config['cache']['token_tipo']);
+                Cache::forget($this->config['cache']['token_validade']);
+                Cache::forget($this->config['cache']['token']);
+            }
 
             return $body;
         } catch (\Exception $e) {
@@ -91,9 +99,13 @@ class HttpClientService
     public function validateTokenRequest(string $tokenTipo, string $token)
     {
         try {
+            if (empty($tokenTipo) || empty($token)) {
+                return false;
+            }
+
             $resp = $this->guzzle->request('POST', 'api/auth/check', [
                 'headers' => [
-                    'Authorization' => "{$tokenTipo} {$token}"
+                    'Authorization' => "{$tokenTipo} {$token}",
                 ],
             ]);
 
