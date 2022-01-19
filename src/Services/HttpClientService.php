@@ -72,9 +72,9 @@ class HttpClientService
 
             $body = json_decode($resp->getBody()->getContents(), true);
 
-            Cache::add(Config::get('autorizacao.cache.token_tipo'), $body['token_tipo']);
-            Cache::add(Config::get('autorizacao.cache.token_validade'), $body['token_validade']);
-            Cache::add(Config::get('autorizacao.cache.token'), $body['token']);
+            Cache::put(Config::get('autorizacao.cache.token_tipo'), $body['token_tipo']);
+            Cache::put(Config::get('autorizacao.cache.token_validade'), $body['token_validade']);
+            Cache::put(Config::get('autorizacao.cache.token'), $body['token']);
 
             return $body;
         } catch (\Exception $e) {
