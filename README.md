@@ -36,10 +36,13 @@ composer update abc-da-construcao/autorizacao-package-client
 ## Configuração
 
 ### Geral
-Atualizar as chaves no arquivo `.env` do seu projeto conforme cadastro na API de Autorização.
+Garanta que os valores das chaves `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do seu projeto tenha sido 
+cadastradas corretamente na API de Autorização. As mesmas devem ser fornecidas para cadastro da aplicação. 
+Se por alguma razão esses valores modificarem no seu projeto, deve ser informado para que seja atualizado.
+
 ```shell
 APP_NAME="api_pedidos-production"
-APP_KEY=adsfdfkje3453271023sfsewrwperivx
+APP_KEY=base64:yGRgEDlwBFxUDUTrP/N0WWjK236dFaiD91yGsaowsMM=
 ```
 
 <br/>
