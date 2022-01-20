@@ -12,6 +12,7 @@ use AbcDaConstrucao\AutorizacaoCliente\Services\JWTService;
 use Illuminate\Auth\GenericUser;
 use Illuminate\Contracts\Support\DeferrableProvider;
 use Illuminate\Http\Request;
+use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
 class AutorizacaoServiceProvider extends ServiceProvider implements DeferrableProvider
@@ -84,7 +85,7 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
 
     protected function registerAclMiddleware()
     {
-//        $router = $this->app->make(Router::class);
-        $this->app['router']->aliasMiddleware('acl', AclMiddleware::class);
+        $router = $this->app->make(Router::class);
+        $router->aliasMiddleware('acl', AclMiddleware::class);
     }
 }
