@@ -5,6 +5,7 @@ namespace AbcDaConstrucao\AutorizacaoCliente\Providers;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\ACL;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\JWT;
+use AbcDaConstrucao\AutorizacaoCliente\Http\Middleware\AclMiddleware;
 use AbcDaConstrucao\AutorizacaoCliente\Services\AclService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\JWTService;
@@ -26,6 +27,7 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
         $this->mergeConfigFrom($path, 'autorizacao_abc');
         $this->publishes([$path => $this->app->configPath('autorizacao_abc.php')], 'autorizacao_abc:config');
         $this->registerAuthGuard();
+        $this->registerAclMiddleware();
     }
 
     /**
@@ -78,5 +80,11 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
 
             return new GenericUser($user ?? []);
         });
+    }
+
+    protected function registerAclMiddleware()
+    {
+//        $router = $this->app->make(Router::class);
+        $this->app['router']->aliasMiddleware('acl', AclMiddleware::class);
     }
 }
