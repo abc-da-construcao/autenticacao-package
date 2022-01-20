@@ -2,142 +2,122 @@
 
 namespace AbcDaConstrucao\AutorizacaoCliente\Services;
 
-use Illuminate\Routing\Route;
-use Illuminate\Support\Facades\App;
-use Illuminate\Support\Facades\Config;
+use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
 use Illuminate\Support\Facades\Route as RouteFacade;
 
 class AclService
 {
-    /**
-     * Busca todas as rotas da aplicação atual e faz uma map de quais são publicas ou protegidas
-     * para enviar/sincronizar com a API de Autenticação/Autorização.
-     *
-     * @return array
-     */
-    public function getRoutesCollection()
-    {
-        $map = [];
-        $appKey = Config::get('app.key');
+	/**
+	 * Busca todas as rotas da aplicação atual e faz uma map de quais são publicas ou protegidas
+	 * para enviar/sincronizar com a API de Autenticação/Autorização.
+	 *
+	 * @return array
+	 */
+	public function getMapRoutes()
+	{
+		$index = 0;
+		$map = [];
 
-        foreach (RouteFacade::getRoutes() as $index => $route) {
-            /** @var Route $route */
+		foreach (RouteFacade::getRoutes() as $route) {
+			$route = $this->normalizeRoute($route);
 
-            if ($route->action['prefix'] == '_ignition') {
-                continue;
-            }
+			if (!empty($route->action['prefix']) && $route->action['prefix'] == '_ignition') {
+				continue;
+			}
 
-            $map[$index] = [
-                'methods' => implode(' | ', $route->methods),
-                'route' => $route->uri,
-                'name' => $route->getName(),
-                'app_key' => $appKey,
-            ];
+			$map[$index] = (object)[
+				'method' => $this->methodsToString($route->methods),
+				'uri' => $route->uri,
+				'name' => $route->name,
+			];
 
-            if (in_array('acl', $route->action['middleware']) ||
-                in_array('auth', $route->action['middleware']) ||
-                in_array('auth:web', $route->action['middleware']) ||
-                in_array('auth:api', $route->action['middleware'])) {
-                $map[$index]['public'] = false;
-            } else {
-                $map[$index]['public'] = true;
-            }
-        }
+			if (in_array('acl', $route->action['middleware']) ||
+				in_array('auth', $route->action['middleware']) ||
+				in_array('auth:web', $route->action['middleware']) ||
+				in_array('auth:api', $route->action['middleware'])) {
+				$map[$index]->public = false;
+			} else {
+				$map[$index]->public = true;
+			}
 
-        return $map;
-    }
+			$index++;
+		}
 
-    /** @return void */
-    public function syncPermissions()
-    {
-        //$rotasMapeadas = PermissionAclModel::listAll();
-        //$routeCollection = $this->getRoutesCollection();
-        //self::removerNaoUsadas($rotasMapeadas, $routeCollection);
-        //self::inserirNovas($rotasMapeadas, $routeCollection);
-    }
+		return $map;
+	}
 
-    public function methodsToString(array $methods)
-    {
-        return implode(' | ', $methods);
-    }
+	/**
+	 * Normaliza as diferenças de chaves da classe Route do Laravel e Lumen
+	 *
+	 * @param mixed $route
+	 * @return \Illuminate\Routing\Route|object
+	 */
+	protected function normalizeRoute($route)
+	{
+		if (is_array($route)) {
+			$route = (object)$route;
+			$route->name = $route->action['as'] ?? null;
+			$route->methods = [$route->method];
+			$route->action['middleware'] = $route->action['middleware'] ?? [];
+		} else {
+			$route->name = $route->getName();
 
-    /*public function validate(string $methods, string $route, int $userId)
-    {
-        $userGroups = User::getGroups($userId);
+			if ('/' != substr($route->uri, 0, 1)) {
+				$route->uri = '/' . $route->uri;
+			}
+		}
 
-        if (empty($userGroups)) {
-            return false;
-        }
+		return $route;
+	}
 
-        foreach ($userGroups as $group) {
-            if ($group->id == 1) {
-                return true; // usuário administrador pode tudo!
-            }
+	/**
+	 * @return \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService
+	 */
+	public function syncRoutes()
+	{
+		$data = [
+			'routes' => $this->getMapRoutes(),
+		];
 
-            $group->permissions = PermissionAclModel::getPermissionsGroup($group->id);
+		return Http::syncRoutes($data);
+	}
 
-            foreach ($group->permissions as $permission) {
-                if ($methods == $permission->methods && $route == $permission->route) {
-                    return true; // rota existe em um dos grupos do usuário.
-                }
-            }
-        }
+	public function methodsToString(array $methods)
+	{
+		return implode('|', $methods);
+	}
 
-        return false;
-    }*/
+	public function validate(array $currentRouteMethods, string $currentRouteUri)
+	{
+		/*$userGroups = User::getGroups($userId);
 
-    /*public function validatePermissionMenu(string $routeName, int $userId)
-    {
-        $router = RouteFacade::getRoutes()->getByName($routeName);
-        $methods = self::methodsToString($router->methods);
-        $route = $router->uri;
+		if (empty($userGroups)) {
+			return false;
+		}
 
-        return self::validate($methods, $route, $userId);
-    }*/
+		foreach ($userGroups as $group) {
+			if ($group->id == 1) {
+				return true; // usuário administrador pode tudo!
+			}
 
-    /*private function removerNaoUsadas(array $rotasMapeadas, array $routeCollection)
-    {
-        $removerNaoUsadas = [];
+			$group->permissions = PermissionAclModel::getPermissionsGroup($group->id);
 
-        foreach ($rotasMapeadas as $rm) {
-            $check = true;
+			foreach ($group->permissions as $permission) {
+				if ($methods == $permission->methods && $route == $permission->route) {
+					return true; // rota existe em um dos grupos do usuário.
+				}
+			}
+		}
 
-            foreach ($routeCollection as $rc) {
-                if (($rc['methods'] == $rm->methods) && ($rc['route'] == $rm->route)) {
-                    $check = false;
-                }
-            }
+		return false;*/
+	}
 
-            if ($check) {
-                $removerNaoUsadas[] = $rm->id;
-            }
-        }
+	/*public function validatePermissionMenu(string $routeName, int $userId)
+	{
+		$router = RouteFacade::getRoutes()->getByName($routeName);
+		$methods = self::methodsToString($router->methods);
+		$route = $router->uri;
 
-        if (!empty($removerNaoUsadas)) {
-            PermissionAclModel::remove($removerNaoUsadas);
-        }
-    }*/
-
-    /*private function inserirNovas(array $rotasMapeadas, array $routeCollection)
-    {
-        $novas = [];
-
-        foreach ($routeCollection as $rc) {
-            $check = true;
-
-            foreach ($rotasMapeadas as $rm) {
-                if (($rc['methods'] == $rm->methods) && ($rc['route'] == $rm->route)) {
-                    $check = false;
-                }
-            }
-
-            if ($check) {
-                $novas[] = $rc;
-            }
-        }
-
-        if (!empty($novas)) {
-            PermissionAclModel::insert($novas);
-        }
-    }*/
+		return self::validate($methods, $route, $userId);
+	}*/
 }

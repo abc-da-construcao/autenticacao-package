@@ -7,13 +7,6 @@ return [
     // Chave de cadastro da aplicação na API de Autorização.
     'app_key' => env('APP_KEY'),
 
-    /*
-     * Configurações de requisição para API de Autorização.
-     */
-    'base_url' => env('AUTORIZACAO_URL', 'http://eb-autenticacao.eba-9xmwkvhq.us-east-1.elasticbeanstalk.com/'),
-    'connect_timeout' => 10,
-    'timeout' => 30,
-
     // Recomendado usar cache com o driver database ou redis caso a aplicação use autobalance.
     'cache' => [
         'ativo' => false, // Salvar token em cache
@@ -23,4 +16,13 @@ return [
         'token_validade' => 'token_validade',
         'token' => 'token',
     ],
+
+    'acl_session_error' => 'acl_session_error',
+
+    /*
+     * Configurações de requisição para API de Autorização.
+     */
+    'base_url' => env('AUTORIZACAO_URL', 'http://eb-autenticacao.eba-9xmwkvhq.us-east-1.elasticbeanstalk.com/'),
+    'connect_timeout' => 10,
+    'timeout' => 30,
 ];

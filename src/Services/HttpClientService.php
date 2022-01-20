@@ -25,8 +25,8 @@ class HttpClientService
     {
         $url = $this->config['base_url'];
 
-        if ('/' != substr($url, -1)) {
-            $url = $url . '/';
+        if ('/' == substr($url, -1)) {
+            $url = substr($url, 0,-1);
         }
 
         $this->guzzle = new Client([
@@ -65,7 +65,7 @@ class HttpClientService
     public function loginRequest(string $username, string $password)
     {
         try {
-            $resp = $this->guzzle->request('POST', 'api/auth/login', [
+            $resp = $this->guzzle->request('POST', '/api/auth/login', [
                 'json' => [
                     'username' => $username,
                     'password' => $password,
@@ -103,7 +103,7 @@ class HttpClientService
                 return false;
             }
 
-            $resp = $this->guzzle->request('POST', 'api/auth/check', [
+            $resp = $this->guzzle->request('POST', '/api/auth/check', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}",
                 ],
@@ -118,4 +118,20 @@ class HttpClientService
             return false;
         }
     }
+
+	public function syncRoutes(array $data)
+	{
+		try {
+			$resp = $this->guzzle->request('POST', '/api/app/sync-routes', [
+				'json' => $data,
+				'headers' => [
+					'key' => Config::get('autorizacao_abc.app_key')
+				]
+			]);
+
+			return json_decode($resp->getBody()->getContents(), true);
+		} catch (\Exception $e) {
+			return $this->errorHandler($e);
+		}
+	}
 }

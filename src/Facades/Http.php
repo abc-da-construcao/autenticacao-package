@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Facade;
 /**
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService loginRequest(string $username, string $password)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService validateTokenRequest(string $tokenTipo, string $token)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService syncRoutes(array $data)
  *
  * @see AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService
  */

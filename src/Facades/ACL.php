@@ -6,7 +6,9 @@ use AbcDaConstrucao\AutorizacaoCliente\Services\AclService;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService getRoutesCollection()
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService getMapRoutes()
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService methodsToString(array $methods)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService syncRoutes()
  *
  * @see AbcDaConstrucao\AutorizacaoCliente\Services\AclService
  */
