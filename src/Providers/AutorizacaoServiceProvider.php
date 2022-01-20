@@ -2,8 +2,10 @@
 
 namespace AbcDaConstrucao\AutorizacaoCliente\Providers;
 
+use AbcDaConstrucao\AutorizacaoCliente\Facades\ACL;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\JWT;
+use AbcDaConstrucao\AutorizacaoCliente\Services\AclService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\JWTService;
 use Illuminate\Auth\GenericUser;
@@ -40,6 +42,10 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
         $this->app->singleton(JWTService::class, function ($app) {
             return new JWTService;
         });
+
+        $this->app->singleton(AclService::class, function ($app) {
+            return new AclService;
+        });
     }
 
     /**
@@ -49,7 +55,7 @@ class AutorizacaoServiceProvider extends ServiceProvider implements DeferrablePr
      */
     public function provides()
     {
-        return [Http::class, JWT::class];
+        return [Http::class, JWT::class, ACL::class];
     }
 
     protected function registerAuthGuard()

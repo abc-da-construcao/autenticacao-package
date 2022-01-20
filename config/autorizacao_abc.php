@@ -10,7 +10,7 @@ return [
     /*
      * Configurações de requisição para API de Autorização.
      */
-    'base_url' => env('AUTORIZACAO_URL', 'http://localhost:8000'),
+    'base_url' => env('AUTORIZACAO_URL', 'http://eb-autenticacao.eba-9xmwkvhq.us-east-1.elasticbeanstalk.com/'),
     'connect_timeout' => 10,
     'timeout' => 30,
 
