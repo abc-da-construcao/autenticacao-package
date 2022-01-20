@@ -15,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Routing\Router;
 use Illuminate\Support\ServiceProvider;
 
-class AutorizacaoServiceProvider extends ServiceProvider implements DeferrableProvider
+class AutorizacaoServiceProvider extends ServiceProvider
 {
     /**
      * Boot the authentication services for the application.
