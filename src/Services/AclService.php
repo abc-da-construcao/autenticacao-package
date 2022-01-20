@@ -35,7 +35,9 @@ class AclService
             ];
 
             if (in_array('acl', $route->action['middleware']) ||
-                in_array('auth', $route->action['middleware'])) {
+                in_array('auth', $route->action['middleware']) ||
+                in_array('auth:web', $route->action['middleware']) ||
+                in_array('auth:api', $route->action['middleware'])) {
                 $map[$index]['public'] = false;
             } else {
                 $map[$index]['public'] = true;
