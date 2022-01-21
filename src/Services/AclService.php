@@ -3,6 +3,8 @@
 namespace AbcDaConstrucao\AutorizacaoCliente\Services;
 
 use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Route as RouteFacade;
 
 class AclService
@@ -19,14 +21,9 @@ class AclService
 		$map = [];
 
 		foreach (RouteFacade::getRoutes() as $route) {
-			$route = $this->normalizeRoute($route);
-
-			if (!empty($route->action['prefix']) && $route->action['prefix'] == '_ignition') {
-				continue;
-			}
-
+			$route = $this->normalizeRouteByFacade($route);
 			$map[$index] = (object)[
-				'method' => $this->methodsToString($route->methods),
+				'method' => $this->routeMethodsToString($route->methods),
 				'uri' => $route->uri,
 				'name' => $route->name,
 			];
@@ -34,7 +31,8 @@ class AclService
 			if (in_array('acl', $route->action['middleware']) ||
 				in_array('auth', $route->action['middleware']) ||
 				in_array('auth:web', $route->action['middleware']) ||
-				in_array('auth:api', $route->action['middleware'])) {
+				in_array('auth:api', $route->action['middleware'])
+			) {
 				$map[$index]->public = false;
 			} else {
 				$map[$index]->public = true;
@@ -52,13 +50,43 @@ class AclService
 	 * @param mixed $route
 	 * @return \Illuminate\Routing\Route|object
 	 */
-	protected function normalizeRoute($route)
+	public function normalizeRouteByFacade($route)
 	{
 		if (is_array($route)) {
 			$route = (object)$route;
 			$route->name = $route->action['as'] ?? null;
 			$route->methods = [$route->method];
 			$route->action['middleware'] = $route->action['middleware'] ?? [];
+		} else {
+			$route->name = $route->getName();
+
+			if ('/' != substr($route->uri, 0, 1)) {
+				$route->uri = '/' . $route->uri;
+			}
+		}
+
+		return $route;
+	}
+
+	/**
+	 * @param \Illuminate\Http\Request $request
+	 * @return \Illuminate\Routing\Route|object
+	 */
+	public function normalizeRouteByRequest(Request $request)
+	{
+		$route = $request->route();
+
+		if (is_array($route)) {
+			$route = (object)$route[1];
+			$route->uri = $request->path();
+
+			if ('/' != substr($route->uri, 0, 1)) {
+				$route->uri = '/' . $route->uri;
+			}
+
+			$route->name = $route->as ?? null;
+			$route->methods = [$request->method()];
+			$route->action['middleware'] = $route->middleware ?? [];
 		} else {
 			$route->name = $route->getName();
 
@@ -82,42 +110,32 @@ class AclService
 		return Http::syncRoutes($data);
 	}
 
-	public function methodsToString(array $methods)
+	public function routeMethodsToString(array $methods)
 	{
 		return implode('|', $methods);
 	}
 
-	public function validate(array $currentRouteMethods, string $currentRouteUri)
+	public function validate(string $currentRouteMethod, string $currentRouteUri, $user)
 	{
-		/*$userGroups = User::getGroups($userId);
+		$appId = Config::get('autorizacao_abc.app_id');
+		$app = collect($user->apps)->where('id', $appId)->first();
 
-		if (empty($userGroups)) {
+		if (empty($app)) {
 			return false;
 		}
 
-		foreach ($userGroups as $group) {
-			if ($group->id == 1) {
-				return true; // usuário administrador pode tudo!
-			}
+		if ($app['super_admin'] == 1) {
+			return true;
+		}
 
-			$group->permissions = PermissionAclModel::getPermissionsGroup($group->id);
-
-			foreach ($group->permissions as $permission) {
-				if ($methods == $permission->methods && $route == $permission->route) {
-					return true; // rota existe em um dos grupos do usuário.
+		foreach ($app['grupos'] as $grupo) {
+			foreach ($grupo['permissoes'] as $route) {
+				if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
+					return true;
 				}
 			}
 		}
 
-		return false;*/
+		return false;
 	}
-
-	/*public function validatePermissionMenu(string $routeName, int $userId)
-	{
-		$router = RouteFacade::getRoutes()->getByName($routeName);
-		$methods = self::methodsToString($router->methods);
-		$route = $router->uri;
-
-		return self::validate($methods, $route, $userId);
-	}*/
 }

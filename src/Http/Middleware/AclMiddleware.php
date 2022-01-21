@@ -6,7 +6,6 @@ use AbcDaConstrucao\AutorizacaoCliente\Facades\ACL;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Route;
 
 class AclMiddleware
 {
@@ -19,32 +18,36 @@ class AclMiddleware
      */
     public function handle(Request $request, \Closure $next, $guard = null)
     {
-		//dd($request->ajax());
-		$currentRoute = Route::getRoutes()->match($request);
+		if (!Auth::guard($guard)->check()) {
+			return $this->unauthorized($request);
+		}
+
+		$currentRoute = ACL::normalizeRouteByRequest($request);
+
 		foreach (ACL::getMapRoutes() as $mapRoute) {
-            if (ACL::methodsToString($currentRoute->methods) == $mapRoute->methods &&
+			if (ACL::routeMethodsToString($currentRoute->methods) == $mapRoute->method &&
                 $currentRoute->uri == $mapRoute->uri
             ) {
-                if ($mapRoute->public) {
-                    dd('aqui');
-                    return $next($request);
-                }
+				if ($mapRoute->public) {
+					return $next($request);
+				}
 
-                if (Auth::guard($guard)->guest()) {
-                    return $this->forbidden($request);
-                }
-            }
+				if (ACL::validate($mapRoute->method, $mapRoute->uri, Auth::guard($guard)->user())) {
+					return $next($request);
+				}
+			}
         }
 
-        /* $userId = Auth::guard($guard)->user()->id;
-        $validate = ACL::validate($methods, $route, $userId); */
-
-        return $next($request);
+		return $this->forbidden($request);
     }
 
-    private function forbidden(Request $request)
+	/**
+	 * @param \Illuminate\Http\Request $request
+	 * @return mixed
+	 */
+	private function forbidden(Request $request)
     {
-        if ($request->ajax()) {
+        if ($request->ajax() || $request->acceptsJson()) {
             return response()->json('Forbidden', 403);
         }
 
@@ -56,4 +59,23 @@ class AclMiddleware
             return redirect('/')->with($sessionKey, 'Não autorizado.');
         }
     }
+
+	/**
+	 * @param \Illuminate\Http\Request $request
+	 * @return mixed
+	 */
+	private function unauthorized(Request $request)
+	{
+		if ($request->ajax() || $request->acceptsJson()) {
+			return response()->json('Unauthorized', 401);
+		}
+
+		$sessionKey = Config::get('autorizacao_abc.acl_session_error');
+
+		if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
+			return back()->with($sessionKey, 'Usuário não autenticado.');
+		} else {
+			return redirect('/')->with($sessionKey, 'Usuário não autenticado.');
+		}
+	}
 }

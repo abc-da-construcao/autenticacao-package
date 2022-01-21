@@ -1,15 +1,16 @@
 <?php
 
 return [
-    // Nome conforme cadastro da aplicação na API de Autorização
+	// Chave de cadastro da aplicação na API de Autorização.
+	'app_id' => env('APP_ID'),
+
     'app_name' => env('APP_NAME'),
 
-    // Chave de cadastro da aplicação na API de Autorização.
     'app_key' => env('APP_KEY'),
 
     // Recomendado usar cache com o driver database ou redis caso a aplicação use autobalance.
     'cache' => [
-        'ativo' => false, // Salvar token em cache
+        'ativo' => env('TOKEN_CACHE',false), // Salvar token em cache
 
         // Chaves usadas no Cache para guardar dados do token caso ativo = true
         'token_tipo' => 'token_tipo',

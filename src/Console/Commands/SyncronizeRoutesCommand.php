@@ -36,7 +36,7 @@ class SyncronizeRoutesCommand extends Command
 			$time_end = microtime(true);
 			$execution_time = number_format((($time_end - $time_start) / 60), 2);
 			$this->line('');
-			$this->alert($res);
+			$this->line($res);
 			$this->line("Tempo de execução: {$execution_time} min(s)");
 		} catch (\Exception $e) {
 			$this->error($e->getMessage());

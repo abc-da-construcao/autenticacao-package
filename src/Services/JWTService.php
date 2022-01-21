@@ -42,6 +42,10 @@ class JWTService
         $tokenTipo = $tokenTipo ?? $this->getTokenType();
         $token = $token ?? $this->getToken();
 
+		if (empty($tokenTipo) || empty($token)) {
+			return false;
+		}
+
         return Http::validateTokenRequest($tokenTipo, $token);
     }
 

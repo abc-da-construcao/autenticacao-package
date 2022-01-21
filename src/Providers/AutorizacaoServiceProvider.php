@@ -2,6 +2,7 @@
 
 namespace AbcDaConstrucao\AutorizacaoCliente\Providers;
 
+use AbcDaConstrucao\AutorizacaoCliente\AbcGenericUser;
 use AbcDaConstrucao\AutorizacaoCliente\Console\Commands\SyncronizeRoutesCommand;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\ACL;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
@@ -10,12 +11,10 @@ use AbcDaConstrucao\AutorizacaoCliente\Http\Middleware\AclMiddleware;
 use AbcDaConstrucao\AutorizacaoCliente\Services\AclService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\JWTService;
-use Illuminate\Auth\GenericUser;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Str;
 
 class AutorizacaoServiceProvider extends ServiceProvider
 {
@@ -54,12 +53,13 @@ class AutorizacaoServiceProvider extends ServiceProvider
 			return new AclService;
 		});
 
+		$this->app->singleton(AclMiddleware::class, function ($app) {
+			return new AclMiddleware();
+		});
+
 		$this->app->singleton(SyncronizeRoutesCommand::class, function ($app) {
 			return new SyncronizeRoutesCommand;
 		});
-		/*$this->app->singleton(AclMiddleware::class, function ($app) {
-			return new AclMiddleware;
-		});*/
 	}
 
 	/**
@@ -90,21 +90,25 @@ class AutorizacaoServiceProvider extends ServiceProvider
 
 			$user = JWT::getUser($token);
 
-			return new GenericUser($user ?? []);
+			return new AbcGenericUser($user ?? []);
 		});
 	}
 
 	protected function registerAclMiddleware()
 	{
-		/*$router = $this->app['router'];
+		if ($this->isLumen()) {
+			$this->app->routeMiddleware(['acl' => AclMiddleware::class]);
+		} else {
+			$router = $this->app['router'];
 
-		if (method_exists($router, 'aliasMiddleware')) {
-			$router->aliasMiddleware('acl', AclMiddleware::class);
+			if (method_exists($router, 'aliasMiddleware')) {
+				$router->aliasMiddleware('acl', AclMiddleware::class);
+			}
+
+			if (method_exists($router, 'middleware')) {
+				$router->middleware('acl', AclMiddleware::class);
+			}
 		}
-
-		if (method_exists($router, 'middleware')) {
-			$router->middleware('acl', AclMiddleware::class);
-		}*/
 	}
 
 	protected function registerCommands()
@@ -121,7 +125,7 @@ class AutorizacaoServiceProvider extends ServiceProvider
 	 */
 	protected function regiterGates()
 	{
-		try {
+		/*try {
 			foreach (ACL::getMapRoutes() as $route) {
 				if (!empty($route->name)) {
 					Gate::define($route->name, function ($user) use ($route) {
@@ -132,6 +136,11 @@ class AutorizacaoServiceProvider extends ServiceProvider
 			}
 		} catch (\Exception $e) {
 			Log::error($e->getMessage());
-		}
+		}*/
+	}
+
+	protected function isLumen()
+	{
+		return class_exists('Laravel\Lumen\Application');
 	}
 }

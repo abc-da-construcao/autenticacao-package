@@ -40,22 +40,29 @@ composer update abc-da-construcao/autorizacao-package-client
 
 ### Geral
 Garanta que os valores das chaves `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do seu projeto tenha sido 
-cadastradas corretamente na API de Autorização. As mesmas devem ser fornecidas para cadastro da aplicação. 
+cadastradas corretamente na API de Autenticação/Autorização. As mesmas devem ser fornecidas para cadastro da aplicação. 
 Se por alguma razão esses valores modificarem no seu projeto, deve ser informado para que seja atualizado.
+
+A chave `APP_ID` conterá o **id** de registro da aplicação e será fornecida pelo administrador da API de Autenticação/Autorização.
 
 ```shell
 APP_NAME="api_pedidos-production"
 APP_KEY=base64:yGRgEDlwBFxUDUTrP/N0WWjK236dFaiD91yGsaowsMM=
+APP_ID=4
 ```
 
 <br/>
 
 ### Laravel
-Use o seguinte comando para publicar o arquivo de configuração
 
-```shell
-php artisan vendor:publish --provider="AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServiceProvider"
-```
+[//]: # (Use o seguinte comando para publicar o arquivo de configuração)
+
+[//]: # ()
+[//]: # (```shell)
+
+[//]: # (php artisan vendor:publish --provider="AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServiceProvider")
+
+[//]: # (```)
 
 Abra o arquivo `config/auth.php` e altere o driver de autenticação para `jwt` e comente 
 as linhas correspondentes ao `provider`.
@@ -79,8 +86,9 @@ as linhas correspondentes ao `provider`.
 
 ### Lumen
 Copie os seguintes arquivos para o diretório `config` do seu projeto. Crie o diretório caso não exista. <br/>
-> vendor/abc-da-construcao/autorizacao-package-client/config/autorizacao_abc.php <br/>
-vendor/laravel/lumen-framework/config/auth.php <br/>
+
+[//]: # (> vendor/abc-da-construcao/autorizacao-package-client/config/autorizacao_abc.php <br/>)
+> vendor/laravel/lumen-framework/config/auth.php <br/>
 
 
 Abra o arquivo `config/auth.php` e altere o driver de autenticação para `jwt`.
@@ -118,7 +126,6 @@ $app->withFacades();
 */
 
 $app->configure('auth');
-$app->configure('autorizacao_abc');
 
 /*
 |--------------------------------------------------------------------------
