@@ -35,7 +35,7 @@ class JWTService
     /**
      * @param string|null $tokenTipo
      * @param string|null $token
-     * @return bool
+     * @return array|bool
      */
     public function validate(string $tokenTipo = null, string $token = null)
     {
@@ -46,7 +46,13 @@ class JWTService
 			return false;
 		}
 
-        return Http::validateTokenRequest($tokenTipo, $token);
+        $resp = Http::getUserRequest($tokenTipo, $token);
+
+		if (!empty($resp['id'])) {
+			return $resp;
+		}
+
+		return null;
     }
 
     /**

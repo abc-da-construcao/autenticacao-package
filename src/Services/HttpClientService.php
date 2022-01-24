@@ -107,7 +107,7 @@ class HttpClientService
 				return false;
 			}
 
-			$resp = $this->guzzle->request('POST', '/api/auth/check', [
+			$resp = $this->guzzle->request('POST', '/api/auth/logout', [
 				'headers' => [
 					'Authorization' => "{$tokenTipo} {$token}",
 				],
@@ -132,10 +132,10 @@ class HttpClientService
 	/**
 	 * @param string $tokenTipo
 	 * @param string $token
-	 * @return bool
+	 * @return array|false|mixed
 	 * @throws \GuzzleHttp\Exception\GuzzleException
 	 */
-	public function validateTokenRequest(string $tokenTipo, string $token)
+	public function getUserRequest(string $tokenTipo, string $token)
 	{
 		try {
 			$tokenTipo = $tokenTipo ?? JWT::getTokenType();
@@ -145,19 +145,15 @@ class HttpClientService
 				return false;
 			}
 
-			$resp = $this->guzzle->request('POST', '/api/auth/check', [
+			$resp = $this->guzzle->request('POST', '/api/auth/user', [
 				'headers' => [
 					'Authorization' => "{$tokenTipo} {$token}",
 				],
 			]);
 
-			if (in_array($resp->getStatusCode(), [200, 201])) {
-				return true;
-			}
-
-			return false;
+			return json_decode($resp->getBody()->getContents(), true);
 		} catch (\Exception $e) {
-			return false;
+			return $this->errorHandler($e);
 		}
 	}
 

@@ -84,13 +84,11 @@ class AutorizacaoServiceProvider extends ServiceProvider
 				$token = $tokenSplit[1];
 			}
 
-			if (!JWT::validate($tokenTipo, $token)) {
+			if (!$user = JWT::validate($tokenTipo, $token)) {
 				return null;
 			}
 
-			$user = JWT::getUser($token);
-
-			return new AbcGenericUser($user ?? []);
+			return new AbcGenericUser($user);
 		});
 	}
 
