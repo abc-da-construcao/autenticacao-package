@@ -42,15 +42,15 @@ class AutorizacaoServiceProvider extends ServiceProvider
 	public function register()
 	{
 		$this->app->singleton(HttpClientService::class, function ($app) {
-			return new HttpClientService;
+			return new HttpClientService();
 		});
 
 		$this->app->singleton(JWTService::class, function ($app) {
-			return new JWTService;
+			return new JWTService();
 		});
 
 		$this->app->singleton(AclService::class, function ($app) {
-			return new AclService;
+			return new AclService();
 		});
 
 		$this->app->singleton(AclMiddleware::class, function ($app) {
@@ -58,7 +58,7 @@ class AutorizacaoServiceProvider extends ServiceProvider
 		});
 
 		$this->app->singleton(SyncronizeRoutesCommand::class, function ($app) {
-			return new SyncronizeRoutesCommand;
+			return new SyncronizeRoutesCommand();
 		});
 	}
 

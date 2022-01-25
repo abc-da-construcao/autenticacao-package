@@ -117,8 +117,8 @@ class AclService
 
 	public function validate(string $currentRouteMethod, string $currentRouteUri, $user)
 	{
-		$appId = Config::get('autorizacao_abc.app_id');
-		$app = collect($user->apps)->where('id', $appId)->first();
+		$appName = Config::get('autorizacao_abc.app_name');
+		$app = collect($user->apps)->firstWhere('name', $appName);
 
 		if (empty($app)) {
 			return false;

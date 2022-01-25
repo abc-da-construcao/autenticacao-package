@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService loginRequest(string $username, string $password)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService logoutRequest(string $tokenTipo = null, string $token = null)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService getUserRequest(string $tokenTipo, string $token)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService updatePasswordRequest(string $tokenTipo, string $token, array $data)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService syncRoutes(array $data)
  *
  * @see AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService

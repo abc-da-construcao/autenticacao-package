@@ -47,7 +47,7 @@ class AclMiddleware
 	 */
 	private function forbidden(Request $request)
     {
-        if ($request->ajax() || $request->acceptsJson()) {
+        if ($request->acceptsJson() || $request->ajax()) {
             return response()->json('Forbidden', 403);
         }
 
@@ -66,7 +66,7 @@ class AclMiddleware
 	 */
 	private function unauthorized(Request $request)
 	{
-		if ($request->ajax() || $request->acceptsJson()) {
+		if ($request->acceptsJson() || $request->ajax()) {
 			return response()->json('Unauthorized', 401);
 		}
 
