@@ -9,133 +9,134 @@ use Illuminate\Support\Facades\Route as RouteFacade;
 
 class AclService
 {
-	/**
-	 * Busca todas as rotas da aplicação atual e faz uma map de quais são publicas ou protegidas
-	 * para enviar/sincronizar com a API de Autenticação/Autorização.
-	 *
-	 * @return array
-	 */
-	public function getMapRoutes()
-	{
-		$index = 0;
-		$map = [];
+    /**
+     * Busca todas as rotas da aplicação atual e faz uma map de quais são publicas ou protegidas
+     * para enviar/sincronizar com a API de Autenticação/Autorização.
+     *
+     * @return array
+     */
+    public function getMapRoutes()
+    {
+        $index = 0;
+        $map = [];
 
-		foreach (RouteFacade::getRoutes() as $route) {
-			$route = $this->normalizeRouteByFacade($route);
-			$map[$index] = (object)[
-				'method' => $this->routeMethodsToString($route->methods),
-				'uri' => $route->uri,
-				'name' => $route->name,
-			];
+        foreach (RouteFacade::getRoutes() as $route) {
+            $route = $this->normalizeRouteByFacade($route);
+            $map[$index] = (object)[
+                'method' => $this->routeMethodsToString($route->methods),
+                'uri' => $route->uri,
+                'name' => $route->name,
+            ];
 
-			if (in_array('acl', $route->action['middleware']) ||
-				in_array('auth', $route->action['middleware']) ||
-				in_array('auth:web', $route->action['middleware']) ||
-				in_array('auth:api', $route->action['middleware'])
-			) {
-				$map[$index]->public = false;
-			} else {
-				$map[$index]->public = true;
-			}
+            if (
+                in_array('acl', $route->action['middleware']) ||
+                in_array('auth', $route->action['middleware']) ||
+                in_array('auth:web', $route->action['middleware']) ||
+                in_array('auth:api', $route->action['middleware'])
+            ) {
+                $map[$index]->public = false;
+            } else {
+                $map[$index]->public = true;
+            }
 
-			$index++;
-		}
+            $index++;
+        }
 
-		return $map;
-	}
+        return $map;
+    }
 
-	/**
-	 * Normaliza as diferenças de chaves da classe Route do Laravel e Lumen
-	 *
-	 * @param mixed $route
-	 * @return \Illuminate\Routing\Route|object
-	 */
-	public function normalizeRouteByFacade($route)
-	{
-		if (is_array($route)) {
-			$route = (object)$route;
-			$route->name = $route->action['as'] ?? null;
-			$route->methods = [$route->method];
-			$route->action['middleware'] = $route->action['middleware'] ?? [];
-		} else {
-			$route->name = $route->getName();
+    /**
+     * Normaliza as diferenças de chaves da classe Route do Laravel e Lumen
+     *
+     * @param mixed $route
+     * @return \Illuminate\Routing\Route|object
+     */
+    public function normalizeRouteByFacade($route)
+    {
+        if (is_array($route)) {
+            $route = (object)$route;
+            $route->name = $route->action['as'] ?? null;
+            $route->methods = [$route->method];
+            $route->action['middleware'] = $route->action['middleware'] ?? [];
+        } else {
+            $route->name = $route->getName();
 
-			if ('/' != substr($route->uri, 0, 1)) {
-				$route->uri = '/' . $route->uri;
-			}
-		}
+            if ('/' != substr($route->uri, 0, 1)) {
+                $route->uri = '/' . $route->uri;
+            }
+        }
 
-		return $route;
-	}
+        return $route;
+    }
 
-	/**
-	 * @param \Illuminate\Http\Request $request
-	 * @return \Illuminate\Routing\Route|object
-	 */
-	public function normalizeRouteByRequest(Request $request)
-	{
-		$route = $request->route();
+    /**
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Routing\Route|object
+     */
+    public function normalizeRouteByRequest(Request $request)
+    {
+        $route = $request->route();
 
-		if (is_array($route)) {
-			$route = (object)$route[1];
-			$route->uri = $request->path();
+        if (is_array($route)) {
+            $route = (object)$route[1];
+            $route->uri = $request->path();
 
-			if ('/' != substr($route->uri, 0, 1)) {
-				$route->uri = '/' . $route->uri;
-			}
+            if ('/' != substr($route->uri, 0, 1)) {
+                $route->uri = '/' . $route->uri;
+            }
 
-			$route->name = $route->as ?? null;
-			$route->methods = [$request->method()];
-			$route->action['middleware'] = $route->middleware ?? [];
-		} else {
-			$route->name = $route->getName();
+            $route->name = $route->as ?? null;
+            $route->methods = [$request->method()];
+            $route->action['middleware'] = $route->middleware ?? [];
+        } else {
+            $route->name = $route->getName();
 
-			if ('/' != substr($route->uri, 0, 1)) {
-				$route->uri = '/' . $route->uri;
-			}
-		}
+            if ('/' != substr($route->uri, 0, 1)) {
+                $route->uri = '/' . $route->uri;
+            }
+        }
 
-		return $route;
-	}
+        return $route;
+    }
 
-	/**
-	 * @return \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService
-	 */
-	public function syncRoutes()
-	{
-		$data = [
-			'routes' => $this->getMapRoutes(),
-		];
+    /**
+     * @return \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService
+     */
+    public function syncRoutes()
+    {
+        $data = [
+            'routes' => $this->getMapRoutes(),
+        ];
 
-		return Http::syncRoutes($data);
-	}
+        return Http::syncRoutes($data);
+    }
 
-	public function routeMethodsToString(array $methods)
-	{
-		return implode('|', $methods);
-	}
+    public function routeMethodsToString(array $methods)
+    {
+        return implode('|', $methods);
+    }
 
-	public function validate(string $currentRouteMethod, string $currentRouteUri, $user)
-	{
-		$appName = Config::get('autorizacao_abc.app_name');
-		$app = collect($user->apps)->firstWhere('name', $appName);
+    public function validate(string $currentRouteMethod, string $currentRouteUri, $user)
+    {
+        $appName = Config::get('autorizacao_abc.app_name');
+        $app = collect($user->apps)->firstWhere('name', $appName);
 
-		if (empty($app)) {
-			return false;
-		}
+        if (empty($app)) {
+            return false;
+        }
 
-		if ($app['super_admin'] == 1) {
-			return true;
-		}
+        if ($app['super_admin'] == 1) {
+            return true;
+        }
 
-		foreach ($app['grupos'] as $grupo) {
-			foreach ($grupo['permissoes'] as $route) {
-				if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
-					return true;
-				}
-			}
-		}
+        foreach ($app['grupos'] as $grupo) {
+            foreach ($grupo['permissoes'] as $route) {
+                if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
+                    return true;
+                }
+            }
+        }
 
-		return false;
-	}
+        return false;
+    }
 }
