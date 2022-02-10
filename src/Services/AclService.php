@@ -111,14 +111,24 @@ class AclService
         return Http::syncRoutes($data);
     }
 
+    /**
+     * @param array $methods
+     * @return string
+     */
     public function routeMethodsToString(array $methods)
     {
         return implode('|', $methods);
     }
 
+    /**
+     * @param string $currentRouteMethod
+     * @param string $currentRouteUri
+     * @param $user
+     * @return bool
+     */
     public function validate(string $currentRouteMethod, string $currentRouteUri, $user)
     {
-        $appName = Config::get('autorizacao_abc.app_name');
+        $appName = Config::get('abc_autorizacao.app_name');
         $app = collect($user->apps)->firstWhere('name', $appName);
 
         if (empty($app)) {

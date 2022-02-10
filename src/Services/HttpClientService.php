@@ -15,7 +15,7 @@ class HttpClientService
 
     public function __construct()
     {
-        $this->config = Config::get('autorizacao_abc');
+        $this->config = Config::get('abc_autorizacao');
         $this->setGuzzle();
     }
 
@@ -51,7 +51,8 @@ class HttpClientService
         $contents = $e->getMessage();
 
         if ($e instanceof RequestException) {
-            $contents = json_decode($e->getResponse()->getBody()->getContents(), true);
+            $contents = json_decode($e->getResponse()->getBody()->getContents(), true)
+                ?? $e->getResponse()->getBody()->getContents();
         }
 
         return $contents;
@@ -195,10 +196,11 @@ class HttpClientService
     public function syncRoutes(array $data)
     {
         try {
-            $resp = $this->guzzle->request('POST', '/api/app/sync-routes', [
+            $appName = $this->config['app_name'];
+            $resp = $this->guzzle->request('POST', "/api/apps/{$appName}/sync-routes", [
                 'json' => $data,
                 'headers' => [
-                    'App-Name' => Config::get('autorizacao_abc.app_name')
+                    'App-Key' => $this->config['app_key']
                 ],
             ]);
 

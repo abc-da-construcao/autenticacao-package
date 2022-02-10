@@ -23,7 +23,7 @@ Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
   ],
   "require": {
     //...
-    "abc-da-construcao/autorizacao-package-client": "dev-main"
+    "abc-da-construcao/autorizacao-package-client": "^1.0"
   }
   //...
 }
@@ -39,12 +39,13 @@ composer update abc-da-construcao/autorizacao-package-client
 ## Configuração
 
 ### Geral
-Garanta que o valor da chave `APP_NAME` contida no arquivo `.env` do seu projeto tenha sido 
-cadastrada corretamente na API de Autenticação/Autorização. A mesma deve ser fornecida para cadastro da aplicação. 
-Se por alguma razão esse valore modificar no seu projeto, deve ser informado para que seja atualizado.
+Garanta que os valores das chaves `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do seu projeto tenham sidas 
+cadastradas corretamente na API de Autenticação/Autorização. As mesmas devem ser fornecidas para cadastro da aplicação. 
+Se por alguma razão esses valores modificarem no seu projeto, deve ser informado para que seja atualizado.
 
 ```shell
 APP_NAME="api_pedidos-production"
+APP_KEY=Gb4E7xqR74Pat9gefb7nidcWFZNW8S66
 ```
 
 <br/>
