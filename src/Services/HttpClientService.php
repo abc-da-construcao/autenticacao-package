@@ -136,7 +136,7 @@ class HttpClientService
      * @return array|false|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function getUserRequest(string $tokenTipo, string $token)
+    public function userValidateRequest(string $tokenTipo, string $token)
     {
         try {
             $tokenTipo = $tokenTipo ?? JWT::getTokenType();
@@ -146,7 +146,7 @@ class HttpClientService
                 return false;
             }
 
-            $resp = $this->guzzle->request('GET', '/api/auth/user', [
+            $resp = $this->guzzle->request('POST', '/api/auth/validate', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}",
                 ],

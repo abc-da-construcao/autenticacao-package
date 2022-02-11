@@ -46,7 +46,7 @@ class JWTService
             return false;
         }
 
-        $resp = Http::getUserRequest($tokenTipo, $token);
+        $resp = Http::userValidateRequest($tokenTipo, $token);
 
         if (!empty($resp['id'])) {
             return $resp;
