@@ -42,17 +42,17 @@ class JWTService
         $tokenTipo = $tokenTipo ?? $this->getTokenType();
         $token = $token ?? $this->getToken();
 
-		if (empty($tokenTipo) || empty($token)) {
-			return false;
-		}
+        if (empty($tokenTipo) || empty($token)) {
+            return false;
+        }
 
         $resp = Http::getUserRequest($tokenTipo, $token);
 
-		if (!empty($resp['id'])) {
-			return $resp;
-		}
+        if (!empty($resp['id'])) {
+            return $resp;
+        }
 
-		return false;
+        return false;
     }
 
     /**

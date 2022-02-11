@@ -28,8 +28,7 @@ class AclService
                 'name' => $route->name,
             ];
 
-            if (
-                in_array('acl', $route->action['middleware']) ||
+            if (in_array('acl', $route->action['middleware']) ||
                 in_array('auth', $route->action['middleware']) ||
                 in_array('auth:web', $route->action['middleware']) ||
                 in_array('auth:api', $route->action['middleware'])
@@ -139,8 +138,8 @@ class AclService
             return true;
         }
 
-        foreach ($app['grupos'] as $grupo) {
-            foreach ($grupo['permissoes'] as $route) {
+        foreach ($app['groups'] as $grupo) {
+            foreach ($grupo['permissions'] as $route) {
                 if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
                     return true;
                 }

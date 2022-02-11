@@ -36,8 +36,8 @@ class HttpClientService
             'timeout' => $this->config['timeout'],
             'verify' => false,
             'headers' => [
-                'Content-Type' => 'application/json; charset=utf-8',
-                'Accept' => 'application/json',
+                'Content-Type' => 'application/json',
+                //'Accept' => 'application/json',
             ],
         ]);
     }
