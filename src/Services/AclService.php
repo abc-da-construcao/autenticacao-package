@@ -28,7 +28,8 @@ class AclService
                 'name' => $route->name,
             ];
 
-            if (in_array('acl', $route->action['middleware']) ||
+            if (
+                in_array('acl', $route->action['middleware']) ||
                 in_array('auth', $route->action['middleware']) ||
                 in_array('auth:web', $route->action['middleware']) ||
                 in_array('auth:api', $route->action['middleware'])
@@ -130,7 +131,7 @@ class AclService
         $appName = Config::get('abc_autorizacao.app_name');
         $app = collect($user->apps)->firstWhere('name', $appName);
 
-        if (empty($app)) {
+        if (empty($app) || $app->active == 0) {
             return false;
         }
 
@@ -138,10 +139,12 @@ class AclService
             return true;
         }
 
-        foreach ($app['groups'] as $grupo) {
-            foreach ($grupo['permissions'] as $route) {
-                if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
-                    return true;
+        foreach ($app['groups'] as $group) {
+            if ($group->active == 1) {
+                foreach ($group['permissions'] as $route) {
+                    if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
+                        return true;
+                    }
                 }
             }
         }
