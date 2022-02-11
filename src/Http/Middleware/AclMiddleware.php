@@ -48,15 +48,15 @@ class AclMiddleware
     private function forbidden(Request $request)
     {
         if ($request->acceptsJson() || $request->ajax()) {
-            return response()->json('Forbidden', 403);
+            return response()->json(['message' => 'This action is unauthorized.'], 403);
         }
 
         $sessionKey = Config::get('abc_autorizacao.acl_session_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
-            return back()->with($sessionKey, 'Não autorizado.');
+            return back()->with($sessionKey, 'Ação não autorizada.');
         } else {
-            return redirect('/')->with($sessionKey, 'Não autorizado.');
+            return redirect('/')->with($sessionKey, 'Ação não autorizada.');
         }
     }
 
@@ -67,7 +67,7 @@ class AclMiddleware
     private function unauthorized(Request $request)
     {
         if ($request->acceptsJson() || $request->ajax()) {
-            return response()->json('Unauthorized', 401);
+            return response()->json(['message' => 'Unauthenticated'], 401);
         }
 
         $sessionKey = Config::get('abc_autorizacao.acl_session_error');
