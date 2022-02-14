@@ -5,8 +5,8 @@
   - [**Geral**](#Geral)
   - [**Laravel**](#Laravel)
   - [**Lumen**](#Lumen)
-- [**Autenticação**](#Autenticação)
-- [**ACL**](#Autorização)
+- [**Autenticação**](#Autenticação---auth)
+- [**ACL**](#Autorização---acl)
 
 <br/>
 
