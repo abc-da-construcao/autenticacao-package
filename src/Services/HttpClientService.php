@@ -24,14 +24,12 @@ class HttpClientService
      */
     protected function setGuzzle()
     {
-        $url = $this->config['base_url'];
-
-        if ('/' == substr($url, -1)) {
-            $url = substr($url, 0, -1);
+        if ('/' != substr($this->config['base_url'], -1)) {
+            $this->config['base_url'] = $this->config['base_url'] . '/';
         }
 
         $this->guzzle = new Client([
-            'base_uri' => $url,
+            'base_uri' => $this->config['base_url'],
             'connect_timeout' => $this->config['connect_timeout'],
             'timeout' => $this->config['timeout'],
             'verify' => false,
@@ -67,7 +65,7 @@ class HttpClientService
     public function loginRequest(string $username, string $password)
     {
         try {
-            $resp = $this->guzzle->request('POST', '/api/auth/login', [
+            $resp = $this->guzzle->request('POST', 'auth/login', [
                 'json' => [
                     'username' => $username,
                     'password' => $password,
@@ -108,7 +106,7 @@ class HttpClientService
                 return false;
             }
 
-            $resp = $this->guzzle->request('POST', '/api/auth/logout', [
+            $resp = $this->guzzle->request('POST', 'auth/logout', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}",
                 ],
@@ -146,7 +144,7 @@ class HttpClientService
                 return false;
             }
 
-            $resp = $this->guzzle->request('POST', '/api/auth/validate', [
+            $resp = $this->guzzle->request('POST', 'auth/validate', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}",
                 ],
@@ -175,7 +173,7 @@ class HttpClientService
                 return false;
             }
 
-            $resp = $this->guzzle->request('GET', '/api/auth/user/update-password', [
+            $resp = $this->guzzle->request('GET', 'auth/user/update-password', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}",
                 ],
@@ -197,7 +195,7 @@ class HttpClientService
     {
         try {
             $appName = $this->config['app_name'];
-            $resp = $this->guzzle->request('POST', "/api/apps/{$appName}/sync-routes", [
+            $resp = $this->guzzle->request('POST', "apps/{$appName}/sync-routes", [
                 'json' => $data,
                 'headers' => [
                     'App-Key' => $this->config['app_key']
