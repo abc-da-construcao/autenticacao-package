@@ -131,7 +131,7 @@ class AclService
         $appName = Config::get('abc_autorizacao.app_name');
         $app = collect($user->apps)->firstWhere('name', $appName);
 
-        if (empty($app) || $app->active == 0) {
+        if (empty($app) || $app['active'] == 0) {
             return false;
         }
 
@@ -140,7 +140,7 @@ class AclService
         }
 
         foreach ($app['groups'] as $group) {
-            if ($group->active == 1) {
+            if ($group['active'] == 1) {
                 foreach ($group['permissions'] as $route) {
                     if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
                         return true;
