@@ -12,7 +12,7 @@ return [
      * Exemplo: \App\Repositories\UserRepository::class
      * Valor default: null
     */
-    'user_local_class' => null,
+    'user_local_class' => env('USER_LOCAL_CLASS'),
 
     // Recomendado usar cache com o driver database ou redis caso a aplicação use autobalance.
     'cache' => [
