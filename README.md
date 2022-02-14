@@ -6,7 +6,7 @@
   - [**Laravel**](#Laravel)
   - [**Lumen**](#Lumen)
 - [**Autenticação**](#Autenticação)
-- [**ACL**](#ACL)
+- [**ACL**](#Autorização)
 
 <br/>
 
@@ -39,11 +39,11 @@ composer update abc-da-construcao/autorizacao-package-client
 ## Configuração
 
 ### Geral
-Garanta que os valores das chaves `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do seu projeto tenham sidas 
-cadastradas corretamente na API de Autenticação/Autorização. As mesmas devem ser fornecidas para cadastro da aplicação. 
+Garanta que os valores de `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do seu projeto tenham sidos 
+cadastrados corretamente na API de Autenticação/Autorização. As mesmas devem ser fornecidas para cadastro da aplicação. 
 Se por alguma razão esses valores modificarem no seu projeto, deve ser informado para que seja atualizado.
 
-```shell
+```
 APP_NAME="api_pedidos-production"
 APP_KEY=Gb4E7xqR74Pat9gefb7nidcWFZNW8S66
 ```
@@ -51,15 +51,6 @@ APP_KEY=Gb4E7xqR74Pat9gefb7nidcWFZNW8S66
 <br/>
 
 ### Laravel
-
-[//]: # (Use o seguinte comando para publicar o arquivo de configuração)
-
-[//]: # ()
-[//]: # (```shell)
-
-[//]: # (php artisan vendor:publish --provider="AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServiceProvider")
-
-[//]: # (```)
 
 Abra o arquivo `config/auth.php` e altere o driver de autenticação para `jwt` e comente 
 as linhas correspondentes ao `provider`.
@@ -84,7 +75,6 @@ as linhas correspondentes ao `provider`.
 ### Lumen
 Copie os seguintes arquivos para o diretório `config` do seu projeto. Crie o diretório caso não exista. <br/>
 
-[//]: # (> vendor/abc-da-construcao/autorizacao-package-client/config/autorizacao_abc.php <br/>)
 > vendor/laravel/lumen-framework/config/auth.php <br/>
 
 
@@ -96,7 +86,7 @@ Abra o arquivo `config/auth.php` e altere o driver de autenticação para `jwt`.
 ]
 ```
 
-Configure o arquivo `bootstrap/app.php`.
+Garanta que no arquivo `bootstrap/app.php` exista as seguintes configurações.
 ```PHP
 /*
 |--------------------------------------------------------------------------
@@ -155,10 +145,217 @@ $app->register(AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServicePr
 
 <br/>
 
-## Autenticação
-Em breve
+## Autenticação - `auth`
+
+### Método auxiliar para autenticação de aplicações Frontend Laravel/Lumen.
+Auxilia as aplicações frontend a realizar login com o mesmo comportamento atual.
+`Http::loginRequest($username, $base64_password)`. 
+
+**Configuração no arquivo `.env`:**
+```
+TOKEN_CACHE=true
+```
+
+**Exemplo de uso:**
+```PHP
+// routes/web.php
+<?php
+
+use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
+use Illuminate\Http\Request;
+
+Route::post('/login', function (Request $request) {
+    $response = Http::loginRequest($request->username, base64_encode($request->password));
+
+    if (isset($response['token'])) {
+        return redirect()->route('home');
+    }
+
+    return back()->with('errors', $response['message']);
+});
+```
+
+resultado esperado em `$response`.
+```PHP
+// statuscode 200
+[
+  'token_tipo' => 'Bearer',
+  'token_validade' => '2022-02-11T21:49:35-03:00',
+  'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTY0NDYwODk3NSwiZXhwIjoxNjQ0NjI2OTc1LCJuYmYiOjE2NDQ2MDg5NzUsImp0aSI6IlhXT0M5QWRDcGZWZW5WWGQiLCJzdWIiOjMsInBydiI6ImYzNzVlYWVkMGM2ZjE2YjJjOWUyYmY1NzE2YzUwMTZiNzUwZjI1NjcifQ.5YrwxDYLNzpt1xnnX5jyVtoEUIMkYfrpDykqNsLTY0g',
+]
+
+// statuscode 401
+['message' => 'Credenciais inválidas.']
+
+// statuscode 401
+['message' => 'Usuário desativado.']
+```
+
+### Método de acesso aos dados do usuário logado.
+Após autenticação os dados do usuário estarão disponíveis na facade `Auth` do Laravel ou Lumen. Tenham atenção para especificar o guardião caso não seja o default. Exemplos de acesso.
+```PHP
+use Illuminate\Support\Facades\Auth;
+
+$user = Auth::user(); // Frontend Laravel ou API Lumen
+$user = Auth::guard('api')->user(); // API Laravel
+
+dd($user->toArray());
+// result
+[
+  'id' => 3,
+  'name' => 'Nome Sobrenome',
+  'username' => 'nome.sobrenome',
+  'email' => 'nome.sobrenome@abcdaconstrucao.com.br',
+  'email_verified_at' => '2022-02-09 18:04:12',
+  'active' => '1',
+  'root' => '0',
+  'created_by' => '1',
+  'updated_by' => '1',
+  'created_at' => '2022-02-09 21:04:12',
+  'updated_at' => '2022-02-09 21:04:12',
+  'apps' => [
+    0 => [
+      'id' => 1,
+      'name' => 'API_PEDIDOS_SERVER-DEV',
+      'url' => 'http://localhost:3000',
+      'created_by' => '1',
+      'updated_by' => '1',
+      'active' => '1',
+      'created_at' => '2022-02-09 21:04:13',
+      'updated_at' => '2022-02-09 21:04:13',
+      'super_admin' => '1',
+      'groups' => [
+        0 => [
+          'id' => 1,
+          'app_id' => '1',
+          'name' => 'Farming',
+          'description' => 'Usuários do grupo Farming API_PEDIDOS_SERVER-DEV',
+          'active' => '1',
+          'created_by' => '3',
+          'updated_by' => '3',
+          'created_at' => '2022-02-09 21:04:13',
+          'updated_at' => '2022-02-09 21:04:13',
+          'permissions' => [
+            0 => [
+              'id' => 10,
+              'app_id' => '1',
+              'method' => 'GET',
+              'uri' => '/',
+              'name' => 'home',
+              'public' => '0',
+            ],
+          ],
+        ],
+      ],
+    ],
+    1 => [
+      'id' => 2,
+      'name' => 'API_PEDIDOS_FRONT-DEV',
+      'url' => 'http://localhost:3100',
+      'created_by' => '1',
+      'updated_by' => '1',
+      'active' => '1',
+      'created_at' => '2022-02-09 21:04:13',
+      'updated_at' => '2022-02-09 21:04:13',
+      'super_admin' => '0',
+      'groups' => [
+        0 => [
+          'id' => 2,
+          'app_id' => '2',
+          'name' => 'Farming',
+          'description' => 'Usuários do grupo Farming API_PEDIDOS_FRONT-DEV',
+          'active' => '1',
+          'created_by' => '3',
+          'updated_by' => '3',
+          'created_at' => '2022-02-09 21:04:13',
+          'updated_at' => '2022-02-09 21:04:13',
+          'permissions' => [
+            0 => [
+              'id' => 4,
+              'app_id' => '2',
+              'method' => 'GET|HEAD',
+              'uri' => '/home',
+              'name' => 'home',
+              'public' => '0',
+            ],
+          ],
+        ],
+      ],
+    ],
+  ],
+]
+```
+
+### Dados complementares para o usuário logado.
+Caso em sua aplicação seja necessário adicionar mais campos para o usuário logado, basta
+informar nas configurações uma classe que implemente a interface 
+`\AbcDaConstrucao\AutorizacaoCliente\Contracts\MergeLocalUserInterface`. Essa classe deve conter o método `getUserFromMerge(int $abcUserId)` que retorna um array que será mergeado com os dados do usuário logado. Como parâmetro, o método recebe o id do usuário logado para facilitar o relacionamento com os dados locais. Exemplo de implementação.
+
+```PHP
+<?php
+
+namespace App\Repositories;
+
+use AbcDaConstrucao\AutorizacaoCliente\Contracts\MergeLocalUserInterface;
+
+class UserRepository implements MergeLocalUserInterface
+{
+    /**
+     * @param int $abcUserId
+     * @return array
+     */
+    public function getUserFromMerge(int $abcUserId)
+    {
+        $userLocal = User::getByAbcId($abcUserId);
+
+        return [
+            'cpf' => $userLocal->cpf
+        ];
+    }
+}
+```
+Abra o arquivo `.env` e adicione o namespace da classe na chave abaixo.
+
+```
+USER_LOCAL_CLASS=\App\Repositories\UserRepository
+```
+
+Agora ao acessae a facade `Auth` as chaves adicionais do usuário estarão acessíveis.
+
+```PHP
+[
+  'id' => 3,
+  'name' => 'Nome Sobrenome',
+  'username' => 'nome.sobrenome',
+  'email' => 'nome.sobrenome@abcdaconstrucao.com.br',
+  'email_verified_at' => '2022-02-09 18:04:12',
+  'active' => '1',
+  'root' => '0',
+  'created_by' => '1',
+  'updated_by' => '1',
+  'created_at' => '2022-02-09 21:04:12',
+  'updated_at' => '2022-02-09 21:04:12',
+  'apps' => [...],
+  'cpf' => '03614568953' // dado adicionado pela aplicação local
+]
+```
 
 <br/>
 
-## ACL
-Em breve
+## Autorização - `acl`
+
+### Proteger rotas com o middleware `acl` (Autorização).
+Tenha em mente que o middleware de `acl` funciona em conjunto com o middleware de `auth` (Autenticação), sendo assim deve-se utilizar os middlewares em conjunto.
+
+```PHP
+$router->group(['middleware' => ['auth', 'acl']], function () use ($router) {
+    //
+});
+```
+
+### Sincronizar rotas da aplicação com a API de Autorização.
+Após agrupar as rotas que devem estar protegidas pelo `ACL` ou caso aja alterações, deve-se usar o command de sincronização.
+
+```
+php artisan abc-auth:sync-routes
+```

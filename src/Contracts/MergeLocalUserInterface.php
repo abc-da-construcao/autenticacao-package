@@ -11,5 +11,5 @@ interface MergeLocalUserInterface
      * @param int $abcUserId id do usuário na API de Autenticação/Autorização que tenha relação com um usuário app local
      * @return array
      */
-    public function getUserFromMerge(int $abcUserId): array;
+    public function getUserFromMerge(int $abcUserId);
 }
