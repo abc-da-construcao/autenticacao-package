@@ -48,7 +48,7 @@ class AclMiddleware
     private function forbidden(Request $request)
     {
         if ($request->acceptsJson() || $request->ajax()) {
-            return response()->json(['message' => 'This action is unauthorized.'], 403);
+            return response()->json(['message' => 'Ação não autorizada.'], 403);
         }
 
         $sessionKey = Config::get('abc_autorizacao.acl_session_error');
@@ -67,7 +67,7 @@ class AclMiddleware
     private function unauthorized(Request $request)
     {
         if ($request->acceptsJson() || $request->ajax()) {
-            return response()->json(['message' => 'Unauthenticated'], 401);
+            return response()->json(['message' => 'Usuário não autenticado.'], 401);
         }
 
         $sessionKey = Config::get('abc_autorizacao.acl_session_error');
