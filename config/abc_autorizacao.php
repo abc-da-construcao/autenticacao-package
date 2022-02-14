@@ -1,7 +1,7 @@
 <?php
 
 return [
-    // Nome da aplicação cadastrada na API de Autorização.
+    // Nome e chave da aplicação cadastrada na API de Autorização.
     'app_name' => env('APP_NAME'),
     'app_key' => env('APP_KEY'),
 
@@ -9,7 +9,9 @@ return [
      * Classe que usa a interface \AbcDaConstrucao\AutorizacaoCliente\Contracts\MergeLocalUserInterface para fazer
      * merge de dados do usuário logado com usuário da aplicação local
      *
-     * Exemplo: \App\Repositories\UserRepository::class
+     * Exemplo config direto no arquivo: 'user_local_class' => \App\Repositories\UserRepository::class,
+     * Exemplo config no arquivo .env: USER_LOCAL_CLASS=\App\Repositories\UserRepository
+     *
      * Valor default: null
     */
     'user_local_class' => env('USER_LOCAL_CLASS'),
@@ -24,6 +26,8 @@ return [
         'token' => 'token',
     ],
 
+    // Para uso de frontend. Chave de sessão contendo a mensagem de não autorizado.
+    // https://laravel.com/docs/8.x/session#flash-data
     'acl_session_error' => 'acl_session_error',
 
     /*
