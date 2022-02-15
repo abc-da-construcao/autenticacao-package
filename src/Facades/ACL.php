@@ -11,7 +11,8 @@ use Illuminate\Support\Facades\Facade;
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService normalizeRouteByRequest($route)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService routeMethodsToString(array $methods)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService syncRoutes()
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService validate(array $currentRouteMethods, string $currentRouteUri, $user)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService validate(object $mapRoute, $user)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService appIsActive()
  *
  * @see AbcDaConstrucao\AutorizacaoCliente\Services\AclService
  */

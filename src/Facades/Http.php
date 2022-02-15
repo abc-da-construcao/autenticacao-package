@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService userValidateRequest(string $tokenTipo, string $token)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService updatePasswordRequest(string $tokenTipo, string $token, array $data)
  * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService syncRoutes(array $data)
+ * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService appIsActive()
  *
  * @see AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService
  */

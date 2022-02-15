@@ -5,8 +5,12 @@
   - [**Geral**](#Geral)
   - [**Laravel**](#Laravel)
   - [**Lumen**](#Lumen)
-- [**Autenticação**](#Autenticação---auth)
-- [**ACL**](#Autorização---acl)
+- [**Autenticação**](#Autenticação)
+  - [Método auxiliar para autenticação.](#Método-auxiliar-para-autenticação.)
+  - [Método de acesso aos dados do usuário.](#Método-de-acesso-aos-dados-do-usuário.)
+  - [Dados complementares para o usuário logado.](#Dados-complementares-para-o-usuário-logado.)
+- [**Autorização**](#Autorização)
+  - [Sincronizar rotas da aplicação com a API de Autorização.](#Sincronizar-rotas-da-aplicação-com-a-API-de-Autorização.)
 
 <br/>
 
@@ -39,9 +43,8 @@ composer update abc-da-construcao/autorizacao-package-client
 ## Configuração
 
 ### Geral
-Garanta que os valores de `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do seu projeto tenham sidos 
-cadastrados corretamente na API de Autenticação/Autorização. As mesmas devem ser fornecidas para cadastro da aplicação. 
-Se por alguma razão esses valores modificarem no seu projeto, deve ser informado para que seja atualizado.
+Preencha as chaves `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do projeto conforme 
+cadastro na API de Autenticação/Autorização.
 
 ```
 APP_NAME="api_pedidos-production"
@@ -145,9 +148,9 @@ $app->register(AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServicePr
 
 <br/>
 
-## Autenticação - `auth`
+## Autenticação
 
-### Método auxiliar para autenticação de aplicações Frontend Laravel/Lumen.
+### Método auxiliar para autenticação.
 Auxilia as aplicações frontend a realizar login com o mesmo comportamento atual.
 `Http::loginRequest($username, $base64_password)`. 
 
@@ -191,8 +194,8 @@ resultado esperado em `$response`.
 ['message' => 'Usuário desativado.']
 ```
 
-### Método de acesso aos dados do usuário logado.
-Após autenticação os dados do usuário estarão disponíveis na facade `Auth` do Laravel ou Lumen. Tenham atenção para especificar o guardião caso não seja o default. Exemplos de acesso.
+### Método de acesso aos dados do usuário.
+Após autenticação, os dados do usuário estarão disponíveis na facade `Auth` do Laravel ou Lumen. Tenham atenção para especificar o guardião caso não seja o default. Exemplos de acesso.
 ```PHP
 use Illuminate\Support\Facades\Auth;
 
@@ -320,7 +323,7 @@ Abra o arquivo `.env` e adicione o namespace da classe na chave abaixo.
 USER_LOCAL_CLASS=\App\Repositories\UserRepository
 ```
 
-Agora ao acessae a facade `Auth` as chaves adicionais do usuário estarão acessíveis.
+Agora ao acessar a facade `Auth` as chaves adicionais do usuário estarão acessíveis.
 
 ```PHP
 [
@@ -342,19 +345,10 @@ Agora ao acessae a facade `Auth` as chaves adicionais do usuário estarão acess
 
 <br/>
 
-## Autorização - `acl`
-
-### Proteger rotas com o middleware `acl` (Autorização).
-Tenha em mente que o middleware de `acl` funciona em conjunto com o middleware de `auth` (Autenticação), sendo assim deve-se utilizar os middlewares em conjunto.
-
-```PHP
-$router->group(['middleware' => ['auth', 'acl']], function () use ($router) {
-    //
-});
-```
+## Autorização
 
 ### Sincronizar rotas da aplicação com a API de Autorização.
-Após agrupar as rotas que devem estar protegidas pelo `ACL` ou caso aja alterações, deve-se usar o command de sincronização.
+Após criar ou atualizar as rotas da aplicação deve-se usar o command de sincronização.
 
 ```
 php artisan abc-auth:sync-routes

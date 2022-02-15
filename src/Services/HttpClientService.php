@@ -207,4 +207,24 @@ class HttpClientService
             return $this->errorHandler($e);
         }
     }
+
+    /**
+     * @return array|mixed
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function appIsActive()
+    {
+        try {
+            $appName = $this->config['app_name'];
+            $resp = $this->guzzle->request('POST', "apps/{$appName}/is-active", [
+                'headers' => [
+                    'App-Key' => $this->config['app_key']
+                ],
+            ]);
+
+            return json_decode($resp->getBody()->getContents(), true);
+        } catch (\Exception $e) {
+            return $this->errorHandler($e);
+        }
+    }
 }

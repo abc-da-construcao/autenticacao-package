@@ -5,7 +5,7 @@ namespace AbcDaConstrucao\AutorizacaoCliente\Services;
 use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Route as RouteFacade;
+use stdClass;
 
 class AclService
 {
@@ -19,8 +19,15 @@ class AclService
     {
         $index = 0;
         $map = [];
+        $routes = [];
 
-        foreach (RouteFacade::getRoutes() as $route) {
+        if (class_exists('Laravel\Lumen\Application')) {
+            $routes = \Illuminate\Support\Facades\Route::getRoutes();
+        } else {
+            $routes = app()->routes;
+        }
+
+        foreach ($routes as $route) {
             $route = $this->normalizeRouteByFacade($route);
             $map[$index] = (object)[
                 'method' => $this->routeMethodsToString($route->methods),
@@ -28,12 +35,7 @@ class AclService
                 'name' => $route->name,
             ];
 
-            if (
-                in_array('acl', $route->action['middleware']) ||
-                in_array('auth', $route->action['middleware']) ||
-                in_array('auth:web', $route->action['middleware']) ||
-                in_array('auth:api', $route->action['middleware'])
-            ) {
+            if (in_array('auth', $route->action['middleware'])) {
                 $map[$index]->public = false;
             } else {
                 $map[$index]->public = true;
@@ -75,28 +77,32 @@ class AclService
      */
     public function normalizeRouteByRequest(Request $request)
     {
+        $routeNormalized = new stdClass;
         $route = $request->route();
 
         if (is_array($route)) {
-            $route = (object)$route[1];
-            $route->uri = $request->path();
+            $routeNormalized->uri = $request->getPathInfo();
 
-            if ('/' != substr($route->uri, 0, 1)) {
-                $route->uri = '/' . $route->uri;
+            if ('/' != substr($routeNormalized->uri, 0, 1)) {
+                $routeNormalized->uri = '/' . $routeNormalized->uri;
             }
 
-            $route->name = $route->as ?? null;
-            $route->methods = [$request->method()];
-            $route->action['middleware'] = $route->middleware ?? [];
+            $routeNormalized->name = $route[1]['as'] ?? null;
+            $routeNormalized->methods = [$request->getMethod()];
+            $routeNormalized->action['middleware'] = $route[1]['middleware'] ?? [];
         } else {
-            $route->name = $route->getName();
+            $routeNormalized->uri = $route->uri;
 
-            if ('/' != substr($route->uri, 0, 1)) {
-                $route->uri = '/' . $route->uri;
+            if ('/' != substr($routeNormalized->uri, 0, 1)) {
+                $routeNormalized->uri = '/' . $routeNormalized->uri;
             }
+
+            $routeNormalized->name = $route->getName();
+            $routeNormalized->methods = $route->methods;
+            $routeNormalized->action = $route->action ?? [];
         }
 
-        return $route;
+        return $routeNormalized;
     }
 
     /**
@@ -121,18 +127,21 @@ class AclService
     }
 
     /**
-     * @param string $currentRouteMethod
-     * @param string $currentRouteUri
+     * @param object $mapRoute
      * @param $user
      * @return bool
      */
-    public function validate(string $currentRouteMethod, string $currentRouteUri, $user)
+    public function validate(object $mapRoute, $user)
     {
         $appName = Config::get('abc_autorizacao.app_name');
         $app = collect($user->apps)->firstWhere('name', $appName);
 
         if (empty($app) || $app['active'] == 0) {
             return false;
+        }
+
+        if ($mapRoute->public) {
+            return true;
         }
 
         if ($app['super_admin'] == 1) {
@@ -142,7 +151,7 @@ class AclService
         foreach ($app['groups'] as $group) {
             if ($group['active'] == 1) {
                 foreach ($group['permissions'] as $route) {
-                    if ($currentRouteMethod == $route['method'] && $currentRouteUri == $route['uri']) {
+                    if ($mapRoute->method == $route['method'] && $mapRoute->uri == $route['uri']) {
                         return true;
                     }
                 }
@@ -150,5 +159,15 @@ class AclService
         }
 
         return false;
+    }
+
+    /**
+     * @return bool
+     */
+    public function appIsActive()
+    {
+        $resp = Http::appIsActive();
+
+        return $resp == true;
     }
 }

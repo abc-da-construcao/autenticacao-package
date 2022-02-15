@@ -10,30 +10,23 @@ use Illuminate\Support\Facades\Config;
 class AclMiddleware
 {
     /**
-     * Handle an incoming request.
-     *
      * @param \Illuminate\Http\Request $request
-     * @param \Closure                 $next
+     * @param \Closure $next
      * @return mixed
      */
     public function handle(Request $request, \Closure $next, $guard = null)
     {
-        if (!Auth::guard($guard)->check()) {
-            return $this->unauthorized($request);
-        }
-
+        $response = $next($request);
         $currentRoute = ACL::normalizeRouteByRequest($request);
 
         foreach (ACL::getMapRoutes() as $mapRoute) {
-            if (ACL::routeMethodsToString($currentRoute->methods) == $mapRoute->method
-                && $currentRoute->uri == $mapRoute->uri
-            ) {
-                if ($mapRoute->public) {
-                    return $next($request);
-                }
-
-                if (ACL::validate($mapRoute->method, $mapRoute->uri, Auth::guard($guard)->user())) {
-                    return $next($request);
+            if (ACL::routeMethodsToString($currentRoute->methods) == $mapRoute->method && $currentRoute->uri == $mapRoute->uri) {
+                if (Auth::guard($guard)->check() && ACL::validate($mapRoute, Auth::guard($guard)->user())) {
+                    return $response;
+                } elseif (!Auth::guard($guard)->check() && !$mapRoute->public) {
+                    return $this->unauthorized($request);
+                } elseif ($mapRoute->public && ACL::appIsActive()) {
+                    return $response;
                 }
             }
         }

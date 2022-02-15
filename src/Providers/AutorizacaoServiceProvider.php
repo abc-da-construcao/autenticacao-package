@@ -13,7 +13,6 @@ use AbcDaConstrucao\AutorizacaoCliente\Services\AclService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService;
 use AbcDaConstrucao\AutorizacaoCliente\Services\JWTService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
@@ -131,17 +130,10 @@ class AutorizacaoServiceProvider extends ServiceProvider
     protected function registerAclMiddleware()
     {
         if ($this->isLumen()) {
-            $this->app->routeMiddleware(['acl' => AclMiddleware::class]);
+            $this->app->middleware([AclMiddleware::class]);
         } else {
-            $router = $this->app['router'];
-
-            if (method_exists($router, 'aliasMiddleware')) {
-                $router->aliasMiddleware('acl', AclMiddleware::class);
-            }
-
-            if (method_exists($router, 'middleware')) {
-                $router->middleware('acl', AclMiddleware::class);
-            }
+            $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
+            $kernel->pushMiddleware(AclMiddleware::class);
         }
     }
 
@@ -167,11 +159,13 @@ class AutorizacaoServiceProvider extends ServiceProvider
                 $rule = $route->name ?? $route->uri;
 
                 Gate::define($rule, function ($user) use ($route) {
-                    if ($route->public) {
+                    if (empty($user) && !$route->public) {
+                        return false;
+                    } elseif (empty($user) && $route->public && ACL::appIsActive()) {
                         return true;
                     }
 
-                    return Acl::validate($route->method, $route->uri, $user);
+                    return Acl::validate($route, $user);
                 });
             }
         } catch (\Exception $e) {
