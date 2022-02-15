@@ -6,11 +6,11 @@
   - [**Laravel**](#Laravel)
   - [**Lumen**](#Lumen)
 - [**Autenticação**](#Autenticação)
-  - [Método auxiliar para autenticação.](#Método-auxiliar-para-autenticação.)
-  - [Método de acesso aos dados do usuário.](#Método-de-acesso-aos-dados-do-usuário.)
-  - [Dados complementares para o usuário logado.](#Dados-complementares-para-o-usuário-logado.)
+  - [Método auxiliar para autenticação.](#método-auxiliar-para-autenticação)
+  - [Método de acesso aos dados do usuário.](#método-de-acesso-aos-dados-do-usuário)
+  - [Dados complementares para o usuário logado.](#dados-complementares-para-o-usuário-logado)
 - [**Autorização**](#Autorização)
-  - [Sincronizar rotas da aplicação com a API de Autorização.](#Sincronizar-rotas-da-aplicação-com-a-API-de-Autorização.)
+  - [Sincronizar rotas da aplicação com a API de Autorização.](#sincronizar-rotas-da-aplicação-com-a-api-de-autorização)
 
 <br/>
 
