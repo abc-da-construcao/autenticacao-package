@@ -73,14 +73,16 @@ class AclService
 
     /**
      * @param \Illuminate\Http\Request $request
-     * @return \Illuminate\Routing\Route|object
+     * @return object|null
      */
     public function normalizeRouteByRequest(Request $request)
     {
         $routeNormalized = new stdClass;
         $route = $request->route();
 
-        if (is_array($route)) {
+        if (empty($route)) {
+            return null;
+        } elseif (is_array($route)) {
             $routeNormalized->uri = $request->getPathInfo();
 
             if ('/' != substr($routeNormalized->uri, 0, 1)) {

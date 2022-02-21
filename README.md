@@ -215,6 +215,18 @@ resultado esperado em `$response`.
     "message" => "Usuário desativado."
   ]
 ]
+
+// statuscode 422
+[▼
+  "status" => 422,
+  "data" => [
+    "message" => "The given data was invalid."
+    "errors" => [
+        "username" => "O campo username é obrigatório",
+        "password" => "O campo password é obrigatório"
+    ]
+  ]
+]
 ```
 
 ### Método de acesso aos dados do usuário.

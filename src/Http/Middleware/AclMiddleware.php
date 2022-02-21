@@ -19,6 +19,10 @@ class AclMiddleware
         $response = $next($request);
         $currentRoute = ACL::normalizeRouteByRequest($request);
 
+        if (empty($currentRoute)) {
+            return $this->notFound($request);
+        }
+
         foreach (ACL::getMapRoutes() as $mapRoute) {
             if (ACL::routeMethodsToString($currentRoute->methods) == $mapRoute->method && $currentRoute->uri == $mapRoute->uri) {
                 if (Auth::guard($guard)->check() && ACL::validate($mapRoute, Auth::guard($guard)->user())) {
@@ -69,6 +73,21 @@ class AclMiddleware
             return back()->with($sessionKey, 'Usuário não autenticado.');
         } else {
             return redirect('/')->with($sessionKey, 'Usuário não autenticado.');
+        }
+    }
+
+    private function notFound(Request $request)
+    {
+        if ($request->acceptsJson() || $request->ajax()) {
+            return response()->json(['message' => 'Url inválida.'], 404);
+        }
+
+        $sessionKey = Config::get('auth_abc.acl_session_error');
+
+        if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
+            return back()->with($sessionKey, 'Url inválida.');
+        } else {
+            return redirect('/')->with($sessionKey, 'Url inválida.');
         }
     }
 }

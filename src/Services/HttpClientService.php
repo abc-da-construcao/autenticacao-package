@@ -35,7 +35,7 @@ class HttpClientService
             'verify' => false,
             'headers' => [
                 'Content-Type' => 'application/json',
-                //'Accept' => 'application/json',
+                'Accept' => 'application/json',
             ],
         ]);
     }
