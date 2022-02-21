@@ -1,8 +1,8 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Console\Commands;
+namespace AbcDaConstrucao\AutenticacaoPackage\Console\Commands;
 
-use AbcDaConstrucao\AutorizacaoCliente\Facades\ACL;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
 use Illuminate\Console\Command;
 
 class SyncronizeRoutesCommand extends Command

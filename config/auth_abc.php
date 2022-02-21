@@ -6,7 +6,7 @@ return [
     'app_key' => env('APP_KEY'),
 
     /*
-     * Classe que usa a interface \AbcDaConstrucao\AutorizacaoCliente\Contracts\MergeLocalUserInterface para fazer
+     * Classe que usa a interface \AbcDaConstrucao\AutenticacaoPackage\Contracts\MergeLocalUserInterface para fazer
      * merge de dados do usuário logado com usuário da aplicação local
      *
      * Exemplo config direto no arquivo: 'user_local_class' => \App\Repositories\UserRepository::class,

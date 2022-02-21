@@ -1,8 +1,8 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Services;
+namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 
-use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
@@ -13,7 +13,7 @@ class JWTService
      */
     public function getToken()
     {
-        return Cache::get(Config::get('abc_autorizacao.cache.token'));
+        return Cache::get(Config::get('auth_abc.cache.token'));
     }
 
     /**
@@ -21,7 +21,7 @@ class JWTService
      */
     public function getTokenType()
     {
-        return Cache::get(Config::get('abc_autorizacao.cache.token_tipo'));
+        return Cache::get(Config::get('auth_abc.cache.token_tipo'));
     }
 
     /**
@@ -29,7 +29,7 @@ class JWTService
      */
     public function getTokenValidade()
     {
-        return Cache::get(Config::get('abc_autorizacao.cache.token_validade'));
+        return Cache::get(Config::get('auth_abc.cache.token_validade'));
     }
 
     /**
@@ -48,8 +48,8 @@ class JWTService
 
         $resp = Http::userValidateRequest($tokenTipo, $token);
 
-        if (!empty($resp['id'])) {
-            return $resp;
+        if (!empty($resp['data']['id'])) {
+            return $resp['data'];
         }
 
         return false;

@@ -1,8 +1,8 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Http\Middleware;
+namespace AbcDaConstrucao\AutenticacaoPackage\Http\Middleware;
 
-use AbcDaConstrucao\AutorizacaoCliente\Facades\ACL;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
@@ -44,7 +44,7 @@ class AclMiddleware
             return response()->json(['message' => 'Ação não autorizada.'], 403);
         }
 
-        $sessionKey = Config::get('abc_autorizacao.acl_session_error');
+        $sessionKey = Config::get('auth_abc.acl_session_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Ação não autorizada.');
@@ -63,7 +63,7 @@ class AclMiddleware
             return response()->json(['message' => 'Usuário não autenticado.'], 401);
         }
 
-        $sessionKey = Config::get('abc_autorizacao.acl_session_error');
+        $sessionKey = Config::get('auth_abc.acl_session_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Usuário não autenticado.');

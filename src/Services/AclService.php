@@ -1,8 +1,8 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Services;
+namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 
-use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use stdClass;
@@ -106,7 +106,7 @@ class AclService
     }
 
     /**
-     * @return \AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService
+     * @return \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService
      */
     public function syncRoutes()
     {
@@ -133,7 +133,7 @@ class AclService
      */
     public function validate(object $mapRoute, $user)
     {
-        $appName = Config::get('abc_autorizacao.app_name');
+        $appName = Config::get('auth_abc.app_name');
         $app = collect($user->apps)->firstWhere('name', $appName);
 
         if (empty($app) || $app['active'] == 0) {

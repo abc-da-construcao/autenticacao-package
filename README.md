@@ -1,4 +1,4 @@
-### Pacote de recursos Laravel e Lumen para auxiliar na implementação da Autorização ABC.
+### Pacote de recursos Laravel e Lumen para auxiliar na implementação da Autenticação/Autorização ABC.
 
 - [**Instalação**](#Instalação)
 - [**Configuração**](#Configuração)
@@ -22,12 +22,12 @@ Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
   "repositories": [
     {
       "type": "vcs",
-      "url": "git@github.com:abc-da-construcao/autorizacao-package-client.git"
+      "url": "git@github.com:abc-da-construcao/autenticacao-package.git"
     }
   ],
   "require": {
     //...
-    "abc-da-construcao/autorizacao-package-client": "^1.0"
+    "abc-da-construcao/autenticacao-package": "^1.0"
   }
   //...
 }
@@ -35,7 +35,7 @@ Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
 
 Em seguida use o comando
 ```shell
-composer update abc-da-construcao/autorizacao-package-client
+composer update abc-da-construcao/autenticacao-package
 ```
 
 <br/>
@@ -90,6 +90,7 @@ Abra o arquivo `config/auth.php` e altere o driver de autenticação para `jwt`.
 ```
 
 Garanta que no arquivo `bootstrap/app.php` exista as seguintes configurações.
+
 ```PHP
 /*
 |--------------------------------------------------------------------------
@@ -102,7 +103,9 @@ Garanta que no arquivo `bootstrap/app.php` exista as seguintes configurações.
 |
 */
 
+// ...
 $app->withFacades();
+// ...
 
 /*
 |--------------------------------------------------------------------------
@@ -115,7 +118,9 @@ $app->withFacades();
 |
 */
 
+// ...
 $app->configure('auth');
+// ...
 
 /*
 |--------------------------------------------------------------------------
@@ -128,9 +133,11 @@ $app->configure('auth');
 |
 */
 
+// ...
 $app->routeMiddleware([
     'auth' => App\Http\Middleware\Authenticate::class,
 ]);
+// ...
 
 /*
 |--------------------------------------------------------------------------
@@ -143,7 +150,10 @@ $app->routeMiddleware([
 |
 */
 
-$app->register(AbcDaConstrucao\AutorizacaoCliente\Providers\AutorizacaoServiceProvider::class);
+// ...
+// $app->register(App\Providers\AuthServiceProvider::class);
+$app->register(AbcDaConstrucao\AutenticacaoPackage\Providers\AuthServiceProvider::class);
+// ...
 ```
 
 <br/>
@@ -182,9 +192,12 @@ resultado esperado em `$response`.
 ```PHP
 // statuscode 200
 [
-  'token_tipo' => 'Bearer',
-  'token_validade' => '2022-02-11T21:49:35-03:00',
-  'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTY0NDYwODk3NSwiZXhwIjoxNjQ0NjI2OTc1LCJuYmYiOjE2NDQ2MDg5NzUsImp0aSI6IlhXT0M5QWRDcGZWZW5WWGQiLCJzdWIiOjMsInBydiI6ImYzNzVlYWVkMGM2ZjE2YjJjOWUyYmY1NzE2YzUwMTZiNzUwZjI1NjcifQ.5YrwxDYLNzpt1xnnX5jyVtoEUIMkYfrpDykqNsLTY0g',
+    'status' => 200,
+    'data' => [
+        'token_tipo' => 'Bearer',
+        'token_validade' => '2022-02-11T21:49:35-03:00',
+        'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTY0NDYwODk3NSwiZXhwIjoxNjQ0NjI2OTc1LCJuYmYiOjE2NDQ2MDg5NzUsImp0aSI6IlhXT0M5QWRDcGZWZW5WWGQiLCJzdWIiOjMsInBydiI6ImYzNzVlYWVkMGM2ZjE2YjJjOWUyYmY1NzE2YzUwMTZiNzUwZjI1NjcifQ.5YrwxDYLNzpt1xnnX5jyVtoEUIMkYfrpDykqNsLTY0g',
+    ]
 ]
 
 // statuscode 401
@@ -292,14 +305,14 @@ dd($user->toArray());
 ### Dados complementares para o usuário logado.
 Caso em sua aplicação seja necessário adicionar mais campos para o usuário logado, basta
 informar nas configurações uma classe que implemente a interface 
-`\AbcDaConstrucao\AutorizacaoCliente\Contracts\MergeLocalUserInterface`. Essa classe deve conter o método `getUserFromMerge(int $abcUserId)` que retorna um array que será mergeado com os dados do usuário logado. Como parâmetro, o método recebe o id do usuário logado para facilitar o relacionamento com os dados locais. Exemplo de implementação.
+`\AbcDaConstrucao\AutenticacaoPackage\Contracts\MergeLocalUserInterface`. Essa classe deve conter o método `getUserFromMerge(int $abcUserId)` que retorna um array que será mergeado com os dados do usuário logado. Como parâmetro, o método recebe o id do usuário logado para facilitar o relacionamento com os dados locais. Exemplo de implementação.
 
 ```PHP
 <?php
 
 namespace App\Repositories;
 
-use AbcDaConstrucao\AutorizacaoCliente\Contracts\MergeLocalUserInterface;
+use AbcDaConstrucao\AutenticacaoPackage\Contracts\MergeLocalUserInterface;
 
 class UserRepository implements MergeLocalUserInterface
 {

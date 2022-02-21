@@ -1,6 +1,6 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Contracts;
+namespace AbcDaConstrucao\AutenticacaoPackage\Contracts;
 
 interface MergeLocalUserInterface
 {

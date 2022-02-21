@@ -1,10 +1,10 @@
 {
-    "name": "abc-da-construcao/autorizacao-package-client",
+    "name": "abc-da-construcao/autenticacao-package",
     "type": "package",
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "AbcDaConstrucao\\AutorizacaoCliente\\": "src/"
+            "AbcDaConstrucao\\AutenticacaoPackage\\": "src/"
         }
     },
     "authors": [
@@ -27,11 +27,11 @@
     "extra": {
         "laravel": {
             "aliases": {
-                "Http": "AbcDaConstrucao\\AutorizacaoCliente\\Facades\\Http",
-                "JWT": "AbcDaConstrucao\\AutorizacaoCliente\\Facades\\JWT"
+                "Http": "AbcDaConstrucao\\AutenticacaoPackage\\Facades\\Http",
+                "JWT": "AbcDaConstrucao\\AutenticacaoPackage\\Facades\\JWT"
             },
             "providers": [
-                "AbcDaConstrucao\\AutorizacaoCliente\\Providers\\AutorizacaoServiceProvider"
+                "AbcDaConstrucao\\AutenticacaoPackage\\Providers\\AuthServiceProvider"
             ]
         }
     }

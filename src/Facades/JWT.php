@@ -1,19 +1,19 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Facades;
+namespace AbcDaConstrucao\AutenticacaoPackage\Facades;
 
-use AbcDaConstrucao\AutorizacaoCliente\Services\JWTService;
+use AbcDaConstrucao\AutenticacaoPackage\Services\JWTService;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getToken()
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getTokenType()
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getTokenValidade()
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getPayload($token = null)
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService getUser($token = null)
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\JWTService validate(string $tokenTipo = null, string $token = null)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getToken()
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getTokenType()
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getTokenValidade()
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getPayload($token = null)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getUser($token = null)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService validate(string $tokenTipo = null, string $token = null)
  *
- * @see AbcDaConstrucao\AutorizacaoCliente\Services\JWTService
+ * @see AbcDaConstrucao\AutenticacaoPackage\Services\JWTService
  */
 class JWT extends Facade
 {

@@ -1,8 +1,8 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Services;
+namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 
-use AbcDaConstrucao\AutorizacaoCliente\Facades\JWT;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Cache;
@@ -15,7 +15,7 @@ class HttpClientService
 
     public function __construct()
     {
-        $this->config = Config::get('abc_autorizacao');
+        $this->config = Config::get('auth_abc');
         $this->setGuzzle();
     }
 
@@ -46,14 +46,19 @@ class HttpClientService
      */
     protected function errorHandler(\Exception $e)
     {
-        $contents = $e->getMessage();
+        $status = ($e->getCode() >= 100 && $e->getCode() <= 511) ? $e->getCode() : 500;
+        $data = $e->getMessage();
 
         if ($e instanceof RequestException) {
-            $contents = json_decode($e->getResponse()->getBody()->getContents(), true)
+            $status = $e->getResponse()->getStatusCode();
+            $data = json_decode($e->getResponse()->getBody()->getContents(), true)
                 ?? $e->getResponse()->getBody()->getContents();
         }
 
-        return $contents;
+        return [
+            'status' => $status,
+            'data' => $data
+        ];
     }
 
     /**
@@ -72,9 +77,9 @@ class HttpClientService
                 ],
             ]);
 
-            $body = json_decode($resp->getBody()->getContents(), true);
+            $body = json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents();
 
-            if ($this->config['cache']['ativo'] == true) {
+            if ($this->config['cache']['ativo'] == true && is_array($body)) {
                 Cache::put($this->config['cache']['token_tipo'], (string)$body['token_tipo'], 600);
                 Cache::put($this->config['cache']['token_validade'], (string)$body['token_validade'], 600);
                 Cache::put($this->config['cache']['token'], (string)$body['token'], 600);
@@ -84,7 +89,10 @@ class HttpClientService
                 Cache::forget($this->config['cache']['token']);
             }
 
-            return $body;
+            return [
+                'status' => $resp->getStatusCode(),
+                'data' => $body
+            ];
         } catch (\Exception $e) {
             return $this->errorHandler($e);
         }
@@ -150,7 +158,10 @@ class HttpClientService
                 ],
             ]);
 
-            return json_decode($resp->getBody()->getContents(), true);
+            return [
+                'status' => $resp->getStatusCode(),
+                'data' => json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents()
+            ];
         } catch (\Exception $e) {
             return $this->errorHandler($e);
         }
@@ -173,14 +184,17 @@ class HttpClientService
                 return false;
             }
 
-            $resp = $this->guzzle->request('GET', 'auth/user/update-password', [
+            $resp = $this->guzzle->request('GET', 'auth/update-password', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}",
                 ],
                 'json' => $data
             ]);
 
-            return json_decode($resp->getBody()->getContents(), true);
+            return [
+                'status' => $resp->getStatusCode(),
+                'data' => json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents()
+            ];
         } catch (\Exception $e) {
             return $this->errorHandler($e);
         }
@@ -202,7 +216,10 @@ class HttpClientService
                 ],
             ]);
 
-            return json_decode($resp->getBody()->getContents(), true);
+            return [
+                'status' => $resp->getStatusCode(),
+                'data' => json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents()
+            ];
         } catch (\Exception $e) {
             return $this->errorHandler($e);
         }
@@ -222,7 +239,10 @@ class HttpClientService
                 ],
             ]);
 
-            return json_decode($resp->getBody()->getContents(), true);
+            return [
+                'status' => $resp->getStatusCode(),
+                'data' => json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents()
+            ];
         } catch (\Exception $e) {
             return $this->errorHandler($e);
         }

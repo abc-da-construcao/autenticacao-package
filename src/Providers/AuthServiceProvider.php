@@ -1,24 +1,24 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Providers;
+namespace AbcDaConstrucao\AutenticacaoPackage\Providers;
 
-use AbcDaConstrucao\AutorizacaoCliente\AbcGenericUser;
-use AbcDaConstrucao\AutorizacaoCliente\Console\Commands\SyncronizeRoutesCommand;
-use AbcDaConstrucao\AutorizacaoCliente\Contracts\MergeLocalUserInterface;
-use AbcDaConstrucao\AutorizacaoCliente\Facades\ACL;
-use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
-use AbcDaConstrucao\AutorizacaoCliente\Facades\JWT;
-use AbcDaConstrucao\AutorizacaoCliente\Http\Middleware\AclMiddleware;
-use AbcDaConstrucao\AutorizacaoCliente\Services\AclService;
-use AbcDaConstrucao\AutorizacaoCliente\Services\HttpClientService;
-use AbcDaConstrucao\AutorizacaoCliente\Services\JWTService;
+use AbcDaConstrucao\AutenticacaoPackage\AbcGenericUser;
+use AbcDaConstrucao\AutenticacaoPackage\Console\Commands\SyncronizeRoutesCommand;
+use AbcDaConstrucao\AutenticacaoPackage\Contracts\MergeLocalUserInterface;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\JWT;
+use AbcDaConstrucao\AutenticacaoPackage\Http\Middleware\AclMiddleware;
+use AbcDaConstrucao\AutenticacaoPackage\Services\AclService;
+use AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService;
+use AbcDaConstrucao\AutenticacaoPackage\Services\JWTService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
-class AutorizacaoServiceProvider extends ServiceProvider
+class AuthServiceProvider extends ServiceProvider
 {
     /**
      * Boot the authentication services for the application.
@@ -27,10 +27,10 @@ class AutorizacaoServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $config = __DIR__ . '/../../config/abc_autorizacao.php';
-        $this->mergeConfigFrom($config, 'abc_autorizacao');
-        $this->publishes([$config => $this->app->configPath('abc_autorizacao.php')], 'abc_autorizacao:config');
-        $this->registerAuthGuard();
+        $config = __DIR__ . '/../../config/auth_abc.php';
+        $this->mergeConfigFrom($config, 'auth_abc');
+        $this->publishes([$config => $this->app->configPath('auth_abc.php')], 'abc_auth:config');
+        $this->registerJwtAuthGuard();
         $this->registerAclMiddleware();
         $this->registerCommands();
         $this->regiterGates();
@@ -74,7 +74,10 @@ class AutorizacaoServiceProvider extends ServiceProvider
         return [Http::class, JWT::class, ACL::class];
     }
 
-    protected function registerAuthGuard()
+    /**
+     * @return void
+     */
+    protected function registerJwtAuthGuard()
     {
         $this->app['auth']->viaRequest('jwt', function (Request $request) {
             $tokenTipo = JWT::getTokenType();
@@ -102,7 +105,7 @@ class AutorizacaoServiceProvider extends ServiceProvider
      */
     protected function mergeLocalUser(array $user)
     {
-        $config = Config::get('abc_autorizacao');
+        $config = Config::get('auth_abc');
 
         if (!empty($config['user_local_class']) && class_exists($config['user_local_class'])
             && in_array(MergeLocalUserInterface::class, class_implements($config['user_local_class']))

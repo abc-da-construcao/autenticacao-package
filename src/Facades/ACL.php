@@ -1,20 +1,20 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente\Facades;
+namespace AbcDaConstrucao\AutenticacaoPackage\Facades;
 
-use AbcDaConstrucao\AutorizacaoCliente\Services\AclService;
+use AbcDaConstrucao\AutenticacaoPackage\Services\AclService;
 use Illuminate\Support\Facades\Facade;
 
 /**
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService getMapRoutes()
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService normalizeRouteByFacade($route)
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService normalizeRouteByRequest($route)
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService routeMethodsToString(array $methods)
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService syncRoutes()
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService validate(object $mapRoute, $user)
- * @method static \AbcDaConstrucao\AutorizacaoCliente\Services\AclService appIsActive()
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService getMapRoutes()
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService normalizeRouteByFacade($route)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService normalizeRouteByRequest($route)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService routeMethodsToString(array $methods)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService syncRoutes()
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService validate(object $mapRoute, $user)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService appIsActive()
  *
- * @see AbcDaConstrucao\AutorizacaoCliente\Services\AclService
+ * @see AbcDaConstrucao\AutenticacaoPackage\Services\AclService
  */
 class ACL extends Facade
 {

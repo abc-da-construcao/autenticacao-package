@@ -1,6 +1,6 @@
 <?php
 
-namespace AbcDaConstrucao\AutorizacaoCliente;
+namespace AbcDaConstrucao\AutenticacaoPackage;
 
 use Illuminate\Auth\GenericUser;
 
