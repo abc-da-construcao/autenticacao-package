@@ -174,17 +174,17 @@ TOKEN_CACHE=true
 // routes/web.php
 <?php
 
-use AbcDaConstrucao\AutorizacaoCliente\Facades\Http;
+use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
 use Illuminate\Http\Request;
 
 Route::post('/login', function (Request $request) {
     $response = Http::loginRequest($request->username, base64_encode($request->password));
 
-    if (isset($response['token'])) {
+    if ($response['status'] == 200) {
         return redirect()->route('home');
     }
 
-    return back()->with('errors', $response['message']);
+    return back()->with('errors', $response['data']['message']);
 });
 ```
 
@@ -201,10 +201,20 @@ resultado esperado em `$response`.
 ]
 
 // statuscode 401
-['message' => 'Credenciais inválidas.']
+[▼
+  "status" => 401,
+  "data" => [
+    "message" => "Credenciais inválidas."
+  ]
+]
 
 // statuscode 401
-['message' => 'Usuário desativado.']
+[▼
+  "status" => 401,
+  "data" => [
+    "message" => "Usuário desativado."
+  ]
+]
 ```
 
 ### Método de acesso aos dados do usuário.
