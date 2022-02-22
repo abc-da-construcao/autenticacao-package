@@ -25,17 +25,13 @@ Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
       "url": "git@github.com:abc-da-construcao/autenticacao-package.git"
     }
   ],
-  "require": {
-    //...
-    "abc-da-construcao/autenticacao-package": "^1.0"
-  }
   //...
 }
 ```
 
 Em seguida use o comando
 ```shell
-composer update abc-da-construcao/autenticacao-package
+composer require abc-da-construcao/autenticacao-package
 ```
 
 <br/>
