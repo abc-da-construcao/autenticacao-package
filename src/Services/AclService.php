@@ -170,6 +170,10 @@ class AclService
     {
         $resp = Http::appIsActive();
 
-        return $resp == true;
+        if (isset($resp['status']) && $resp['status'] == 200 && $resp['data'] == true) {
+            return true;
+        }
+
+        return false;
     }
 }
