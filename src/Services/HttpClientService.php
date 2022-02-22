@@ -64,7 +64,7 @@ class HttpClientService
     /**
      * @param string $username
      * @param string $password
-     * @return mixed
+     * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function loginRequest(string $username, string $password)
@@ -74,6 +74,49 @@ class HttpClientService
                 'json' => [
                     'username' => $username,
                     'password' => $password,
+                ],
+            ]);
+
+            $body = json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents();
+
+            if ($this->config['cache']['ativo'] == true && is_array($body)) {
+                Cache::put($this->config['cache']['token_tipo'], (string)$body['token_tipo'], 600);
+                Cache::put($this->config['cache']['token_validade'], (string)$body['token_validade'], 600);
+                Cache::put($this->config['cache']['token'], (string)$body['token'], 600);
+            } elseif ($this->config['cache']['ativo'] == false && Cache::has($this->config['cache']['token'])) {
+                Cache::forget($this->config['cache']['token_tipo']);
+                Cache::forget($this->config['cache']['token_validade']);
+                Cache::forget($this->config['cache']['token']);
+            }
+
+            return [
+                'status' => $resp->getStatusCode(),
+                'data' => $body
+            ];
+        } catch (\Exception $e) {
+            return $this->errorHandler($e);
+        }
+    }
+
+    /**
+     * @param string|null $tokenTipo
+     * @param string|null $token
+     * @return array
+     * @throws \GuzzleHttp\Exception\GuzzleException
+     */
+    public function refreshTokenRequest(string $tokenTipo = null, string $token = null)
+    {
+        try {
+            $tokenTipo = $tokenTipo ?? JWT::getTokenType();
+            $token = $token ?? JWT::getToken();
+
+            if (empty($tokenTipo) || empty($token)) {
+                return false;
+            }
+
+            $resp = $this->guzzle->request('POST', 'auth/refresh', [
+                'headers' => [
+                    'Authorization' => "{$tokenTipo} {$token}",
                 ],
             ]);
 
@@ -137,12 +180,12 @@ class HttpClientService
     }
 
     /**
-     * @param string $tokenTipo
-     * @param string $token
+     * @param string|null $tokenTipo
+     * @param string|null $token
      * @return array|false|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function userValidateRequest(string $tokenTipo, string $token)
+    public function userValidateRequest(string $tokenTipo = null, string $token = null)
     {
         try {
             $tokenTipo = $tokenTipo ?? JWT::getTokenType();
@@ -168,13 +211,13 @@ class HttpClientService
     }
 
     /**
-     * @param string $tokenTipo
-     * @param string $token
+     * @param string|null $tokenTipo
+     * @param string|null $token
      * @param array $data
      * @return array|false|mixed
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
-    public function updatePasswordRequest(string $tokenTipo, string $token, array $data)
+    public function updatePasswordRequest(string $tokenTipo = null, string $token = null, array $data)
     {
         try {
             $tokenTipo = $tokenTipo ?? JWT::getTokenType();

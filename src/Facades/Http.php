@@ -7,9 +7,10 @@ use Illuminate\Support\Facades\Facade;
 
 /**
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService loginRequest(string $username, string $password)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService refreshTokenRequest(string $tokenTipo = null, string $token = null)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService logoutRequest(string $tokenTipo = null, string $token = null)
- * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService userValidateRequest(string $tokenTipo, string $token)
- * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService updatePasswordRequest(string $tokenTipo, string $token, array $data)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService userValidateRequest(string $tokenTipo = null, string $token = null)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService updatePasswordRequest(string $tokenTipo = null, string $token = null, array $data)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService syncRoutes(array $data)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService appIsActive()
  *
