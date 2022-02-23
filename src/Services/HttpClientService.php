@@ -154,7 +154,10 @@ class HttpClientService
             $token = $token ?? JWT::getToken();
 
             if (empty($tokenTipo) || empty($token)) {
-                return false;
+                return [
+                    'status' => 409,
+                    'data' => 'Token inválido'
+                ];
             }
 
             $resp = $this->guzzle->request('POST', 'auth/logout', [
@@ -169,13 +172,14 @@ class HttpClientService
                     Cache::forget($this->config['cache']['token_validade']);
                     Cache::forget($this->config['cache']['token']);
                 }
-
-                return true;
             }
 
-            return false;
+            return [
+                'status' => $resp->getStatusCode(),
+                'data' => json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents()
+            ];
         } catch (\Exception $e) {
-            return false;
+            return $this->errorHandler($e);
         }
     }
 
