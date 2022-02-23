@@ -135,6 +135,10 @@ class AclService
      */
     public function validate(object $mapRoute, $user)
     {
+        if ($user->active == 0) {
+            return false;
+        }
+
         $appName = Config::get('auth_abc.app_name');
         $app = collect($user->apps)->firstWhere('name', $appName);
 
