@@ -9,6 +9,7 @@
   - [Método auxiliar para autenticação.](#método-auxiliar-para-autenticação)
   - [Método de acesso aos dados do usuário.](#método-de-acesso-aos-dados-do-usuário)
   - [Dados complementares para o usuário logado.](#dados-complementares-para-o-usuário-logado)
+  - [Método auxiliar para logout.](#método-auxiliar-para-logout)
 - [**Autorização**](#Autorização)
   - [Sincronizar rotas da aplicação com a API de Autorização.](#sincronizar-rotas-da-aplicação-com-a-api-de-autorização)
 
@@ -157,32 +158,56 @@ $app->register(AbcDaConstrucao\AutenticacaoPackage\Providers\AuthServiceProvider
 ## Autenticação
 
 ### Método auxiliar para autenticação.
-Auxilia as aplicações frontend a realizar login com o mesmo comportamento atual.
 `Http::loginRequest($username, $base64_password)`. 
 
-**Configuração no arquivo `.env`:**
-```
-TOKEN_CACHE=true
+**Exemplos em API Lumen**
+
+```PHP
+<?php
+
+use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
+use Illuminate\Http\Request;
+
+$router->post('/login', function (Request $request) {
+    // A senha deve ser enviada com base64 encode para API de Autenticação. 
+    $response = Http::loginRequest($request->username, base64_encode($request->password));
+
+    // Devolve o token caso status 200 ou o erro específico 
+    // Ver abaixo resultado esperado do $response.
+    return response()->json($response['data'], $response['status']);
+});
 ```
 
-**Exemplo de uso:**
+<br>
+
+**Exemplo em Frontend Laravel/Lumen** <br>
+
+O método `Http::loginRequest()`, pode salvar o token em cache quando
+adicionado a chave `TOKEN_CACHE=true` no arquivo `.env`. Com o token em cache 
+os dados do usuário poderão ser obtidos com a facade `Auth::user()` e será mantido algo similar a sessão. 
+
 ```PHP
-// routes/web.php
 <?php
 
 use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
 use Illuminate\Http\Request;
 
 Route::post('/login', function (Request $request) {
+    // A senha deve ser enviada com base64 encode para API de Autenticação.
     $response = Http::loginRequest($request->username, base64_encode($request->password));
 
+    // token obtido e salvo em cache.
+    // Redireciona o usuário a página desejada.
     if ($response['status'] == 200) {
         return redirect()->route('home');
     }
 
+    // Se o token não for emitido retorna o usuário a página de login com os erros.
     return back()->with('errors', $response['data']['message']);
 });
 ```
+
+<br>
 
 resultado esperado em `$response`.
 ```PHP
@@ -197,7 +222,7 @@ resultado esperado em `$response`.
 ]
 
 // statuscode 401
-[▼
+[
   "status" => 401,
   "data" => [
     "message" => "Credenciais inválidas."
@@ -205,7 +230,7 @@ resultado esperado em `$response`.
 ]
 
 // statuscode 401
-[▼
+[
   "status" => 401,
   "data" => [
     "message" => "Usuário desativado."
@@ -213,7 +238,7 @@ resultado esperado em `$response`.
 ]
 
 // statuscode 422
-[▼
+[
   "status" => 422,
   "data" => [
     "message" => "The given data was invalid."
@@ -230,7 +255,7 @@ Após autenticação, os dados do usuário estarão disponíveis na facade `Auth
 ```PHP
 use Illuminate\Support\Facades\Auth;
 
-$user = Auth::user(); // Frontend Laravel ou API Lumen
+$user = Auth::user(); // API Lumen ou Frontend Laravel 
 $user = Auth::guard('api')->user(); // API Laravel
 
 dd($user->toArray());
@@ -375,6 +400,65 @@ Agora ao acessar a facade `Auth` as chaves adicionais do usuário estarão acess
 ```
 
 <br/>
+
+### Método auxiliar para logout
+
+`Http::logoutRequest($tokenTipo, $token);` <br>
+
+**Aplicações API**
+
+```PHP
+$router->post('/logout', ['as' => 'logout', function (Request $request) {
+    $header = $request->header('Authorization');
+    $token = explode(' ', $header);
+    $response = Http::logoutRequest($token[0], $token[1]);
+    
+    return response()->json($response['data'], $response['status']);
+}]);
+
+// Aplicações Frontend Laravel/Lumen com o `TOKEN_CACHE=true`
+$router->post('/logout', ['as' => 'logout', function (Request $request) {
+    
+    $response = Http::logoutRequest();
+    
+    return response()->json($response['data'], $response['status']);
+}]);
+```
+
+<br>
+
+**Para aplicações Frontend Laravel/Lumen** <br>
+
+Com a opção `TOKEN_CACHE=true` no arquivo `.env`, o método busca o 
+token armazenado no cache e não há necessidade de passar os parâmetros.
+
+```PHP
+$router->post('/logout', ['as' => 'logout', function (Request $request) {
+    $response = Http::logoutRequest();
+
+    // Redireciona a página desejada.
+    if ($response['status'] == 200) {
+        return redirect()->route('login');
+    }
+    
+    // Retorna erro caso exista.
+    return back()->with('error', $response['data']);
+}]);
+```
+
+<br>
+
+**Resultado esperado em $response.** <br>
+```PHP
+[
+    'status' => 200,
+    'data' => [
+        'message' => 'Desconectado com sucesso.'
+    ]
+]
+```
+
+<br>
 
 ## Autorização
 
