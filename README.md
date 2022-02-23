@@ -182,9 +182,9 @@ $router->post('/login', function (Request $request) {
 
 **Exemplo em Frontend Laravel/Lumen** <br>
 
-O método `Http::loginRequest()`, pode salvar o token em cache quando
+O método `Http::loginRequest()` pode salvar o token em cache quando
 adicionado a chave `TOKEN_CACHE=true` no arquivo `.env`. Com o token em cache 
-os dados do usuário poderão ser obtidos com a facade `Auth::user()` e será mantido algo similar a sessão. 
+os dados do usuário poderão ser obtidos com a facade `Auth::user()` e será mantido algo similar a uma sessão. 
 
 ```PHP
 <?php
@@ -209,7 +209,8 @@ Route::post('/login', function (Request $request) {
 
 <br>
 
-resultado esperado em `$response`.
+**Resultado esperado em `$response`.**
+
 ```PHP
 // statuscode 200
 [
@@ -415,14 +416,6 @@ $router->post('/logout', ['as' => 'logout', function (Request $request) {
     
     return response()->json($response['data'], $response['status']);
 }]);
-
-// Aplicações Frontend Laravel/Lumen com o `TOKEN_CACHE=true`
-$router->post('/logout', ['as' => 'logout', function (Request $request) {
-    
-    $response = Http::logoutRequest();
-    
-    return response()->json($response['data'], $response['status']);
-}]);
 ```
 
 <br>
@@ -433,7 +426,7 @@ Com a opção `TOKEN_CACHE=true` no arquivo `.env`, o método busca o
 token armazenado no cache e não há necessidade de passar os parâmetros.
 
 ```PHP
-$router->post('/logout', ['as' => 'logout', function (Request $request) {
+Route::post('/logout', ['as' => 'logout', function (Request $request) {
     $response = Http::logoutRequest();
 
     // Redireciona a página desejada.
