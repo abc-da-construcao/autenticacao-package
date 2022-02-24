@@ -44,7 +44,7 @@ class AclMiddleware
      */
     protected function forbidden(Request $request)
     {
-        if ($request->acceptsJson() || $request->ajax()) {
+        if (!$request->hasSession() && ($request->ajax() || $request->acceptsJson())) {
             return response()->json(['message' => 'Ação não autorizada.'], 403);
         }
 
@@ -63,7 +63,7 @@ class AclMiddleware
      */
     protected function unauthorized(Request $request)
     {
-        if ($request->acceptsJson() || $request->ajax()) {
+        if (!$request->hasSession() && ($request->ajax() || $request->acceptsJson())) {
             return response()->json(['message' => 'Usuário não autenticado.'], 401);
         }
 
@@ -78,7 +78,7 @@ class AclMiddleware
 
     protected function notFound(Request $request)
     {
-        if ($request->acceptsJson() || $request->ajax()) {
+        if (!$request->hasSession() && ($request->ajax() || $request->acceptsJson())) {
             return response()->json(['message' => 'Url inválida.'], 404);
         }
 
