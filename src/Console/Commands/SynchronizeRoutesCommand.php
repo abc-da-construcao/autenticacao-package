@@ -5,7 +5,7 @@ namespace AbcDaConstrucao\AutenticacaoPackage\Console\Commands;
 use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
 use Illuminate\Console\Command;
 
-class SyncronizeRoutesCommand extends Command
+class SynchronizeRoutesCommand extends Command
 {
     /**
      * The console command name.

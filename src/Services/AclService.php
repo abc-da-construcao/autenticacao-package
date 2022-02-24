@@ -24,7 +24,7 @@ class AclService
         if (class_exists('Laravel\Lumen\Application')) {
             $routes = \Illuminate\Support\Facades\Route::getRoutes();
         } else {
-            $routes = app()->routes;
+            $routes = \Illuminate\Support\Facades\Route::getRoutes()->getRoutes();
         }
 
         foreach ($routes as $route) {

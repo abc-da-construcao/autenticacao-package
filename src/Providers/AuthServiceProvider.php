@@ -3,7 +3,7 @@
 namespace AbcDaConstrucao\AutenticacaoPackage\Providers;
 
 use AbcDaConstrucao\AutenticacaoPackage\AbcGenericUser;
-use AbcDaConstrucao\AutenticacaoPackage\Console\Commands\SyncronizeRoutesCommand;
+use AbcDaConstrucao\AutenticacaoPackage\Console\Commands\SynchronizeRoutesCommand;
 use AbcDaConstrucao\AutenticacaoPackage\Contracts\MergeLocalUserInterface;
 use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
 use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
@@ -21,6 +21,23 @@ use Illuminate\Support\ServiceProvider;
 class AuthServiceProvider extends ServiceProvider
 {
     /**
+     * Indicates if loading of the provider is deferred.
+     *
+     * @var bool
+     */
+    protected $defer = true;
+
+    /**
+     * Determine if the provider is deferred.
+     *
+     * @return bool
+     */
+    public function isDeferred()
+    {
+        return $this->defer;
+    }
+
+    /**
      * Boot the authentication services for the application.
      *
      * @return void
@@ -33,7 +50,7 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerJwtAuthGuard();
         $this->registerAclMiddleware();
         $this->registerCommands();
-        $this->regiterGates();
+        // $this->registerGates();
     }
 
     /**
@@ -59,8 +76,8 @@ class AuthServiceProvider extends ServiceProvider
             return new AclMiddleware();
         });
 
-        $this->app->singleton(SyncronizeRoutesCommand::class, function ($app) {
-            return new SyncronizeRoutesCommand();
+        $this->app->singleton(SynchronizeRoutesCommand::class, function ($app) {
+            return new SynchronizeRoutesCommand();
         });
     }
 
@@ -71,7 +88,15 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function provides()
     {
-        return [Http::class, JWT::class, ACL::class];
+        return [
+            Http::class,
+            // JWT::class,
+            // ACL::class,
+            HttpClientService::class,
+            // JWTService::class,
+            // AclService::class,
+            SynchronizeRoutesCommand::class,
+        ];
     }
 
     /**
@@ -132,7 +157,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerAclMiddleware()
     {
-        if ($this->isLumen()) {
+        if (class_exists('Laravel\Lumen\Application')) {
             $this->app->middleware([AclMiddleware::class]);
         } else {
             $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
@@ -147,7 +172,7 @@ class AuthServiceProvider extends ServiceProvider
     {
         if ($this->app->runningInConsole()) {
             $this->commands([
-                SyncronizeRoutesCommand::class,
+                SynchronizeRoutesCommand::class,
             ]);
         }
     }
@@ -155,7 +180,7 @@ class AuthServiceProvider extends ServiceProvider
     /**
      * @return void
      */
-    protected function regiterGates()
+    protected function registerGates()
     {
         try {
             foreach (ACL::getMapRoutes() as $route) {
@@ -173,14 +198,7 @@ class AuthServiceProvider extends ServiceProvider
             }
         } catch (\Exception $e) {
             Log::error($e->getMessage());
+            // throw $e;
         }
-    }
-
-    /**
-     * @return bool
-     */
-    protected function isLumen()
-    {
-        return class_exists('Laravel\Lumen\Application');
     }
 }
