@@ -4,7 +4,9 @@ namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 
 use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Route;
 use stdClass;
 
 class AclService
@@ -22,9 +24,9 @@ class AclService
         $routes = [];
 
         if (class_exists('Laravel\Lumen\Application')) {
-            $routes = \Illuminate\Support\Facades\Route::getRoutes();
+            $routes = Route::getRoutes();
         } else {
-            $routes = \Illuminate\Support\Facades\Route::getRoutes()->getRoutes();
+            $routes = Route::getRoutes()->getRoutes();
         }
 
         foreach ($routes as $route) {
@@ -179,5 +181,27 @@ class AclService
         }
 
         return false;
+    }
+
+    /**
+     * @param string $routeNameOrUri
+     * @return bool
+     */
+    public function hasRouteAccess(string $routeNameOrUri)
+    {
+        $user = Auth::guard('api')->user() ?? Auth::guard('web')->user();
+        $route = null;
+
+        foreach($this->getMapRoutes() as $mapRoute) {
+            if ($mapRoute->name == $routeNameOrUri || $mapRoute->uri == $routeNameOrUri) {
+                $route = $mapRoute;
+            }
+        };
+
+        if (empty($user) || empty($route)) {
+            return false;
+        }
+
+        return $this->validate($route, $user);
     }
 }

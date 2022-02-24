@@ -42,7 +42,7 @@ class AclMiddleware
      * @param \Illuminate\Http\Request $request
      * @return mixed
      */
-    private function forbidden(Request $request)
+    protected function forbidden(Request $request)
     {
         if ($request->acceptsJson() || $request->ajax()) {
             return response()->json(['message' => 'Ação não autorizada.'], 403);
@@ -61,7 +61,7 @@ class AclMiddleware
      * @param \Illuminate\Http\Request $request
      * @return mixed
      */
-    private function unauthorized(Request $request)
+    protected function unauthorized(Request $request)
     {
         if ($request->acceptsJson() || $request->ajax()) {
             return response()->json(['message' => 'Usuário não autenticado.'], 401);
@@ -76,7 +76,7 @@ class AclMiddleware
         }
     }
 
-    private function notFound(Request $request)
+    protected function notFound(Request $request)
     {
         if ($request->acceptsJson() || $request->ajax()) {
             return response()->json(['message' => 'Url inválida.'], 404);

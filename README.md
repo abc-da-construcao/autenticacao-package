@@ -10,6 +10,7 @@
   - [Método de acesso aos dados do usuário.](#método-de-acesso-aos-dados-do-usuário)
   - [Dados complementares para o usuário logado.](#dados-complementares-para-o-usuário-logado)
   - [Método auxiliar para logout.](#método-auxiliar-para-logout)
+  - [Método auxiliar para verificar permissão de acesso.](#método-auxiliar-para-verificar-permissão-de-acesso)
 - [**Autorização**](#Autorização)
   - [Sincronizar rotas da aplicação com a API de Autorização.](#sincronizar-rotas-da-aplicação-com-a-api-de-autorização)
 
@@ -449,6 +450,24 @@ Route::post('/logout', ['as' => 'logout', function (Request $request) {
         'message' => 'Desconectado com sucesso.'
     ]
 ]
+```
+
+### Método auxiliar para verificar permissão de acesso
+O método `ACL::hasRouteAccess(string $routeNameOrUri)` recebe o `nome` ou a `uri` de uma rota e retorna boolean se o usuário
+atual tem permissão de acesso. Pode ser aplicado em diversas situações de uso.
+
+```PHP
+// Lumen - routes/web.php
+$router->get('/api/profile', ['as' => 'api.profile', function (Request $request) use ($router) {
+    // ...
+}]);
+
+use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
+// Nome da rota.
+ACL::hasRouteAccess('api.profile');
+
+// URI da rota
+ACL::hasRouteAccess('/api/profile');
 ```
 
 <br>

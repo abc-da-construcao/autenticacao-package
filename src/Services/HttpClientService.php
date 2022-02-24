@@ -144,7 +144,7 @@ class HttpClientService
     /**
      * @param string|null $tokenTipo
      * @param string|null $token
-     * @return bool
+     * @return array
      * @throws \GuzzleHttp\Exception\GuzzleException
      */
     public function logoutRequest(string $tokenTipo = null, string $token = null)

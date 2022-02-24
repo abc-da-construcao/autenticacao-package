@@ -5,8 +5,6 @@ namespace AbcDaConstrucao\AutenticacaoPackage\Providers;
 use AbcDaConstrucao\AutenticacaoPackage\AbcGenericUser;
 use AbcDaConstrucao\AutenticacaoPackage\Console\Commands\SynchronizeRoutesCommand;
 use AbcDaConstrucao\AutenticacaoPackage\Contracts\MergeLocalUserInterface;
-use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
-use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
 use AbcDaConstrucao\AutenticacaoPackage\Facades\JWT;
 use AbcDaConstrucao\AutenticacaoPackage\Http\Middleware\AclMiddleware;
 use AbcDaConstrucao\AutenticacaoPackage\Services\AclService;
@@ -14,8 +12,6 @@ use AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService;
 use AbcDaConstrucao\AutenticacaoPackage\Services\JWTService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\ServiceProvider;
 
 class AuthServiceProvider extends ServiceProvider
@@ -50,7 +46,6 @@ class AuthServiceProvider extends ServiceProvider
         $this->registerJwtAuthGuard();
         $this->registerAclMiddleware();
         $this->registerCommands();
-        // $this->registerGates();
     }
 
     /**
@@ -60,7 +55,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(HttpClientService::class, function ($app) {
+        $this->app->singleton(HttpClientService::class, function () {
             return new HttpClientService();
         });
 
@@ -69,7 +64,7 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(AclService::class, function ($app) {
-            return new AclService();
+            return new AclService($app);
         });
 
         $this->app->singleton(AclMiddleware::class, function ($app) {
@@ -89,12 +84,6 @@ class AuthServiceProvider extends ServiceProvider
     public function provides()
     {
         return [
-            Http::class,
-            // JWT::class,
-            // ACL::class,
-            HttpClientService::class,
-            // JWTService::class,
-            // AclService::class,
             SynchronizeRoutesCommand::class,
         ];
     }
@@ -105,19 +94,24 @@ class AuthServiceProvider extends ServiceProvider
     protected function registerJwtAuthGuard()
     {
         $this->app['auth']->viaRequest('jwt', function (Request $request) {
+            // Busca token do cache caso TOKEN_CACHE=true no .env
             $tokenTipo = JWT::getTokenType();
             $token = JWT::getToken();
 
-            if ($request->header('Authorization')) {
+            // dá preferência para o token passado via header
+            if ($request->hasheader('Authorization')) {
                 $tokenSplit = explode(' ', $request->header('Authorization'));
-                $tokenTipo = $tokenSplit[0];
-                $token = $tokenSplit[1];
+                if (count($tokenSplit) == 2) {
+                    $tokenTipo = $tokenSplit[0];
+                    $token = $tokenSplit[1];
+                }
             }
 
             if (!$user = JWT::validate($tokenTipo, $token)) {
                 return null;
             }
 
+            // faz merge de dados do usuário local
             $user = $this->mergeLocalUser($user);
 
             return new AbcGenericUser($user);
@@ -160,7 +154,7 @@ class AuthServiceProvider extends ServiceProvider
         if (class_exists('Laravel\Lumen\Application')) {
             $this->app->middleware([AclMiddleware::class]);
         } else {
-            $kernel = app()->make(\Illuminate\Contracts\Http\Kernel::class);
+            $kernel = $this->app->make(\Illuminate\Contracts\Http\Kernel::class);
             $kernel->pushMiddleware(AclMiddleware::class);
         }
     }
@@ -174,31 +168,6 @@ class AuthServiceProvider extends ServiceProvider
             $this->commands([
                 SynchronizeRoutesCommand::class,
             ]);
-        }
-    }
-
-    /**
-     * @return void
-     */
-    protected function registerGates()
-    {
-        try {
-            foreach (ACL::getMapRoutes() as $route) {
-                $rule = $route->name ?? $route->uri;
-
-                Gate::define($rule, function ($user) use ($route) {
-                    if (empty($user) && !$route->public) {
-                        return false;
-                    } elseif (empty($user) && $route->public && ACL::appIsActive()) {
-                        return true;
-                    }
-
-                    return Acl::validate($route, $user);
-                });
-            }
-        } catch (\Exception $e) {
-            Log::error($e->getMessage());
-            // throw $e;
         }
     }
 }
