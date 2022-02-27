@@ -48,7 +48,7 @@ class AclMiddleware
             return response()->json(['message' => 'Ação não autorizada.'], 403);
         }
 
-        $sessionKey = Config::get('auth_abc.acl_session_error');
+        $sessionKey = Config::get('auth_abc.session.acl_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Ação não autorizada.');
@@ -67,7 +67,7 @@ class AclMiddleware
             return response()->json(['message' => 'Usuário não autenticado.'], 401);
         }
 
-        $sessionKey = Config::get('auth_abc.acl_session_error');
+        $sessionKey = Config::get('auth_abc.session.acl_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Usuário não autenticado.');
@@ -82,7 +82,7 @@ class AclMiddleware
             return response()->json(['message' => 'Url inválida.'], 404);
         }
 
-        $sessionKey = Config::get('auth_abc.acl_session_error');
+        $sessionKey = Config::get('auth_abc.session.acl_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Url inválida.');

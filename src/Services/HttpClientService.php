@@ -5,17 +5,18 @@ namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 use AbcDaConstrucao\AutenticacaoPackage\Facades\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 class HttpClientService
 {
     protected $config;
+    protected $hasSessionFacade;
     protected Client $guzzle;
 
     public function __construct()
     {
         $this->config = Config::get('auth_abc');
+        $this->hasSessionFacade = class_exists('Illuminate\Session\SessionManager');
         $this->setGuzzle();
     }
 
@@ -79,14 +80,16 @@ class HttpClientService
 
             $body = json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents();
 
-            if ($this->config['cache']['ativo'] == true && is_array($body)) {
-                Cache::put($this->config['cache']['token_tipo'], (string)$body['token_tipo'], 600);
-                Cache::put($this->config['cache']['token_validade'], (string)$body['token_validade'], 600);
-                Cache::put($this->config['cache']['token'], (string)$body['token'], 600);
-            } elseif ($this->config['cache']['ativo'] == false && Cache::has($this->config['cache']['token'])) {
-                Cache::forget($this->config['cache']['token_tipo']);
-                Cache::forget($this->config['cache']['token_validade']);
-                Cache::forget($this->config['cache']['token']);
+            if ($this->hasSessionFacade && isset($body['token'])) {
+                session([
+                    $this->config['session']['token_type'] => $body['token_tipo'],
+                    $this->config['session']['token_validate'] => $body['token_validade'],
+                    $this->config['session']['token'] => $body['token']
+                ]);
+            } elseif ($this->hasSessionFacade && session()->has($this->config['session']['token'])) {
+                session()->forget($this->config['session']['token_type']);
+                session()->forget($this->config['session']['token_validate']);
+                session()->forget($this->config['session']['token']);
             }
 
             return [
@@ -122,14 +125,16 @@ class HttpClientService
 
             $body = json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents();
 
-            if ($this->config['cache']['ativo'] == true && is_array($body)) {
-                Cache::put($this->config['cache']['token_tipo'], (string)$body['token_tipo'], 600);
-                Cache::put($this->config['cache']['token_validade'], (string)$body['token_validade'], 600);
-                Cache::put($this->config['cache']['token'], (string)$body['token'], 600);
-            } elseif ($this->config['cache']['ativo'] == false && Cache::has($this->config['cache']['token'])) {
-                Cache::forget($this->config['cache']['token_tipo']);
-                Cache::forget($this->config['cache']['token_validade']);
-                Cache::forget($this->config['cache']['token']);
+            if ($this->hasSessionFacade && isset($body['token'])) {
+                session([
+                    $this->config['session']['token_type'] => $body['token_tipo'],
+                    $this->config['session']['token_validate'] => $body['token_validade'],
+                    $this->config['session']['token'] => $body['token']
+                ]);
+            } elseif ($this->hasSessionFacade && session()->has($this->config['session']['token'])) {
+                session()->forget($this->config['session']['token_type']);
+                session()->forget($this->config['session']['token_validate']);
+                session()->forget($this->config['session']['token']);
             }
 
             return [
@@ -166,12 +171,13 @@ class HttpClientService
                 ],
             ]);
 
-            if (in_array($resp->getStatusCode(), [200, 201])) {
-                if (Cache::has($this->config['cache']['token'])) {
-                    Cache::forget($this->config['cache']['token_tipo']);
-                    Cache::forget($this->config['cache']['token_validade']);
-                    Cache::forget($this->config['cache']['token']);
-                }
+            if (in_array($resp->getStatusCode(), [200, 201])
+                && $this->hasSessionFacade
+                && session()->has($this->config['session']['token'])
+            ) {
+                session()->forget($this->config['session']['token_type']);
+                session()->forget($this->config['session']['token_validate']);
+                session()->forget($this->config['session']['token']);
             }
 
             return [

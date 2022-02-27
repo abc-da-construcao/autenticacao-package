@@ -3,17 +3,27 @@
 namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 
 use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 class JWTService
 {
+    protected $hasSessionFacade;
+
+    public function __construct()
+    {
+        $this->hasSessionFacade = class_exists('Illuminate\Session\SessionManager');
+    }
+
     /**
      * @return mixed
      */
     public function getToken()
     {
-        return Cache::get(Config::get('auth_abc.cache.token'));
+        if ($this->hasSessionFacade && session()->has(Config::get('auth_abc.session.token'))) {
+            return session()->get(Config::get('auth_abc.session.token'));
+        }
+
+        return null;
     }
 
     /**
@@ -21,7 +31,11 @@ class JWTService
      */
     public function getTokenType()
     {
-        return Cache::get(Config::get('auth_abc.cache.token_tipo'));
+        if ($this->hasSessionFacade && session()->has(Config::get('auth_abc.session.token_type'))) {
+            return session()->get(Config::get('auth_abc.session.token_type'));
+        }
+
+        return null;
     }
 
     /**
@@ -29,7 +43,11 @@ class JWTService
      */
     public function getTokenValidade()
     {
-        return Cache::get(Config::get('auth_abc.cache.token_validade'));
+        if ($this->hasSessionFacade && session()->has(Config::get('auth_abc.session.token_validate'))) {
+            return session()->get(Config::get('auth_abc.session.token_validate'));
+        }
+
+        return null;
     }
 
     /**
@@ -74,15 +92,5 @@ class JWTService
         }
 
         return json_decode(base64_decode($splitToken[1]), true);
-    }
-
-    /**
-     * @return mixed|null
-     */
-    public function getUser($token = null)
-    {
-        $payload = $this->getPayload($token);
-
-        return $payload['user'] ?? null;
     }
 }

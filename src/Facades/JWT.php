@@ -10,7 +10,6 @@ use Illuminate\Support\Facades\Facade;
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getTokenType()
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getTokenValidade()
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getPayload($token = null)
- * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService getUser($token = null)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\JWTService validate(string $tokenTipo = null, string $token = null)
  *
  * @see AbcDaConstrucao\AutenticacaoPackage\Services\JWTService

@@ -16,19 +16,17 @@ return [
     */
     'user_local_class' => env('USER_LOCAL_CLASS'),
 
-    // Recomendado usar cache com o driver database ou redis caso a aplicação use autobalance.
-    'cache' => [
-        'ativo' => env('TOKEN_CACHE', false), // Salvar token em cache
-
-        // Chaves usadas no Cache para guardar dados do token caso ativo = true
-        'token_tipo' => 'token_tipo',
-        'token_validade' => 'token_validade',
+    // Para uso no frontend.
+    'session' => [
+        // Chaves usadas para guardar dados do token caso exita sessão no app.
+        'token_type' => 'token_type',
+        'token_validate' => 'token_validate',
         'token' => 'token',
-    ],
 
-    // Para uso de frontend. Chave de sessão contendo a mensagem de não autorizado.
-    // https://laravel.com/docs/8.x/session#flash-data
-    'acl_session_error' => 'acl_session_error',
+        // Chave de sessão contendo a mensagem de não autorizado.
+        // https://laravel.com/docs/8.x/session#flash-data
+        'acl_error' => 'acl_error',
+    ],
 
     /*
      * Configurações de requisição para API de Autorização.

@@ -185,11 +185,12 @@ class AclService
 
     /**
      * @param string $routeNameOrUri
+     * @param string $guard
      * @return bool
      */
-    public function hasRouteAccess(string $routeNameOrUri)
+    public function hasRouteAccess(string $routeNameOrUri, string $guard = 'web')
     {
-        $user = Auth::guard('api')->user() ?? Auth::guard('web')->user();
+        $user = Auth::guard($guard)->user() ?? Auth::guard('api')->user();
         $route = null;
 
         foreach($this->getMapRoutes() as $mapRoute) {

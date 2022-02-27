@@ -183,10 +183,9 @@ $router->post('/login', function (Request $request) {
 
 **Exemplo em Frontend Laravel/Lumen** <br>
 
-O método `Http::loginRequest()` pode salvar o token em cache quando
-adicionado a chave `TOKEN_CACHE=true` no arquivo `.env`. Com o token em cache 
-os dados do usuário poderão ser obtidos com a facade `Auth::user()` e será mantido algo similar a uma sessão. 
-
+O método `Http::loginRequest()` também salva o token em sessão caso exista a classe `Illuminate\Session\SessionManager`,
+facilitando o manuseio do mesmo e mantendo o usuário logado enquanto o token for válido.
+ 
 ```PHP
 <?php
 
@@ -197,7 +196,7 @@ Route::post('/login', function (Request $request) {
     // A senha deve ser enviada com base64 encode para API de Autenticação.
     $response = Http::loginRequest($request->username, base64_encode($request->password));
 
-    // token obtido e salvo em cache.
+    // token obtido e salvo em sessão.
     // Redireciona o usuário a página desejada.
     if ($response['status'] == 200) {
         return redirect()->route('home');
@@ -206,6 +205,15 @@ Route::post('/login', function (Request $request) {
     // Se o token não for emitido retorna o usuário a página de login com os erros.
     return back()->with('errors', $response['data']['message']);
 });
+```
+Posteriormente poderá acessar o token e passar nas requisições seguintes para o backend da seguinte forma.
+
+```PHP
+use Illuminate\Support\Facades\Config;
+
+$token = session()->get(Config::get('auth_abc.session.token'));
+$tokenType = session()->get(Config::get('auth_abc.session.token_type'));
+$tokenValidate = session()->get(Config::get('auth_abc.session.token_validate'));
 ```
 
 <br>
@@ -423,8 +431,7 @@ $router->post('/logout', ['as' => 'logout', function (Request $request) {
 
 **Para aplicações Frontend Laravel/Lumen** <br>
 
-Com a opção `TOKEN_CACHE=true` no arquivo `.env`, o método busca o 
-token armazenado no cache e não há necessidade de passar os parâmetros.
+Será removido as chaves de sessão que contém o token.
 
 ```PHP
 Route::post('/logout', ['as' => 'logout', function (Request $request) {
