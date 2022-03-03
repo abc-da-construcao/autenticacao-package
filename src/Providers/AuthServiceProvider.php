@@ -99,7 +99,7 @@ class AuthServiceProvider extends ServiceProvider
             $token = JWT::getToken();
 
             // dá preferência para o token passado via header
-            if ($request->hasheader('Authorization')) {
+            if ($request->hasHeader('Authorization')) {
                 $tokenSplit = explode(' ', $request->header('Authorization'));
                 if (count($tokenSplit) == 2) {
                     $tokenTipo = $tokenSplit[0];
