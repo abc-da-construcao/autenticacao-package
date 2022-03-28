@@ -37,7 +37,9 @@ class AclService
                 'name' => $route->name,
             ];
 
-            if (in_array('auth', $route->action['middleware'])) {
+            if (in_array('auth', $route->action['middleware'])
+                || in_array('auth:web', $route->action['middleware'])
+                || in_array('auth:api', $route->action['middleware'])) {
                 $map[$index]->public = false;
             } else {
                 $map[$index]->public = true;
@@ -193,7 +195,7 @@ class AclService
         $user = Auth::guard($guard)->user() ?? Auth::guard('api')->user();
         $route = null;
 
-        foreach($this->getMapRoutes() as $mapRoute) {
+        foreach ($this->getMapRoutes() as $mapRoute) {
             if ($mapRoute->name == $routeNameOrUri || $mapRoute->uri == $routeNameOrUri) {
                 $route = $mapRoute;
             }

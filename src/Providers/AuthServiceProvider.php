@@ -94,11 +94,11 @@ class AuthServiceProvider extends ServiceProvider
     protected function registerJwtAuthGuard()
     {
         $this->app['auth']->viaRequest('jwt', function (Request $request) {
-            // Busca token do cache caso TOKEN_CACHE=true no .env
+            // Busca token da sessão caso exita.
             $tokenTipo = JWT::getTokenType();
             $token = JWT::getToken();
 
-            // dá preferência para o token passado via header
+            // Dá preferência para o token passado via header
             if ($request->hasHeader('Authorization')) {
                 $tokenSplit = explode(' ', $request->header('Authorization'));
                 if (count($tokenSplit) == 2) {

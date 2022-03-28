@@ -16,7 +16,8 @@ class HttpClientService
     public function __construct()
     {
         $this->config = Config::get('auth_abc');
-        $this->hasSessionFacade = class_exists('Illuminate\Session\SessionManager');
+        $this->hasSessionFacade = class_exists('Illuminate\Support\Facades\Session')
+            && !class_exists('Laravel\Lumen\Application');
         $this->setGuzzle();
     }
 

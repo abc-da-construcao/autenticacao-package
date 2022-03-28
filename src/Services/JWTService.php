@@ -11,7 +11,8 @@ class JWTService
 
     public function __construct()
     {
-        $this->hasSessionFacade = class_exists('Illuminate\Session\SessionManager');
+        $this->hasSessionFacade = class_exists('Illuminate\Support\Facades\Session')
+            && !class_exists('Laravel\Lumen\Application');
     }
 
     /**
@@ -19,7 +20,7 @@ class JWTService
      */
     public function getToken()
     {
-        if ($this->hasSessionFacade && session()->has(Config::get('auth_abc.session.token'))) {
+        if ($this->hasSessionFacade) {
             return session()->get(Config::get('auth_abc.session.token'));
         }
 
@@ -31,7 +32,7 @@ class JWTService
      */
     public function getTokenType()
     {
-        if ($this->hasSessionFacade && session()->has(Config::get('auth_abc.session.token_type'))) {
+        if ($this->hasSessionFacade) {
             return session()->get(Config::get('auth_abc.session.token_type'));
         }
 
@@ -43,7 +44,7 @@ class JWTService
      */
     public function getTokenValidade()
     {
-        if ($this->hasSessionFacade && session()->has(Config::get('auth_abc.session.token_validate'))) {
+        if ($this->hasSessionFacade) {
             return session()->get(Config::get('auth_abc.session.token_validate'));
         }
 
