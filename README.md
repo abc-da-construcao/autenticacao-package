@@ -1,10 +1,16 @@
-### Pacote de recursos Laravel e Lumen para auxiliar na implementação da Autenticação/Autorização ABC.
+#### Pacote de recursos Laravel e Lumen para auxiliar na implementação do Sistema de Autenticação Global (SAG).
+
+Este pacote para Lumen e Laravel fornece um driver customizado de autenticação/autorização, middleware, 
+Facade e commands para uso do Sistema de Autenticação Global nos padrões ABC. 
+
+<br>
 
 - [**Instalação**](#Instalação)
 - [**Configuração**](#Configuração)
   - [**Geral**](#Geral)
   - [**Laravel**](#Laravel)
   - [**Lumen**](#Lumen)
+- [**Protegendo Rotas**](#protegendo-rotas)
 - [**Autenticação**](#Autenticação)
   - [Método auxiliar para autenticação.](#método-auxiliar-para-autenticação)
   - [Método de acesso aos dados do usuário.](#método-de-acesso-aos-dados-do-usuário)
@@ -12,7 +18,7 @@
   - [Método auxiliar para logout.](#método-auxiliar-para-logout)
   - [Método auxiliar para verificar permissão de acesso.](#método-auxiliar-para-verificar-permissão-de-acesso)
 - [**Autorização**](#Autorização)
-  - [Sincronizar rotas da aplicação com a API de Autorização.](#sincronizar-rotas-da-aplicação-com-a-api-de-autorização)
+  - [Sincronizar rotas da aplicação com a API de Autenticação.](#sincronizar-rotas-da-aplicação-com-a-api-de-autenticação)
 
 <br/>
 
@@ -51,14 +57,13 @@ Em seguida use o comando abaixo. Será solicitado seu Personal Token a primeira 
 composer require abc-da-construcao/autenticacao-package
 ```
 
-
 <br/>
 
 ## Configuração
 
 ### Geral
 Preencha as chaves `APP_NAME` e `APP_KEY` contidas no arquivo `.env` do projeto conforme 
-cadastro na API de Autenticação/Autorização.
+cadastro no SAG.
 
 ```
 APP_NAME="api_pedidos-production"
@@ -168,6 +173,32 @@ $app->routeMiddleware([
 // $app->register(App\Providers\AuthServiceProvider::class);
 $app->register(AbcDaConstrucao\AutenticacaoPackage\Providers\AuthServiceProvider::class);
 // ...
+```
+
+<br/>
+
+## Protegendo Rotas
+Apesar de apresentar a mesma característica de proteção padrão de rotas, o pacote verifica 
+não só se o token JWT é válido mas também verifica as permissões que o usuário tem na aplicação
+realizando também a função de ACL.
+
+Exemplo de grupo de rotas protegidas por autenticação.
+
+```PHP
+// Lumen
+$router->group(['middleware' => ['auth']], function () use ($router) {
+    // Routes
+});
+
+// Laravel WEB
+Route::middleware(['auth'])->group(function () {
+    // Routes
+});
+
+// Laravel API
+Route::middleware(['auth:api'])->group(function () {
+    // Routes
+});
 ```
 
 <br/>
@@ -497,7 +528,7 @@ ACL::hasRouteAccess('/api/profile');
 
 ## Autorização
 
-### Sincronizar rotas da aplicação com a API de Autorização.
+### Sincronizar rotas da aplicação com a API de Autenticação.
 Após criar ou atualizar as rotas da aplicação deve-se usar o command de sincronização.
 
 ```
