@@ -17,10 +17,10 @@
 <br/>
 
 ## Instalação
-Este repositório é privado, por tanto você deve criar uma chave SSH no servidor
+Este repositório é privado, portanto você deve criar ou informar uma chave rsa para acesso SSH
 e ter um Token de acesso pessoal para conseguir instalar esse pacote.
 
-> Veja aqui: <br>
+> Veja mais informações: <br>
 > - <a href="https://docs.github.com/pt/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account" target="_blank">Adicionar uma nova chave SSH a sua conta GitHub</a>
 > - <a href="https://docs.github.com/pt/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token" target="_blank">Criar um token de acesso pessoal a sua conta GitHub</a>
 
