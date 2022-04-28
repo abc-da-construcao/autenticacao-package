@@ -12,7 +12,7 @@ class SynchronizeRoutesCommand extends Command
      *
      * @var string
      */
-    protected $signature = 'abc-auth:sync-routes';
+    protected $signature = 'abc-sag:sync-routes';
 
     /**
      * The console command description.

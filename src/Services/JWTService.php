@@ -21,7 +21,7 @@ class JWTService
     public function getToken()
     {
         if ($this->hasSessionFacade) {
-            return session()->get(Config::get('auth_abc.session.token'));
+            return session()->get(Config::get('sag.session.token'));
         }
 
         return null;
@@ -33,7 +33,7 @@ class JWTService
     public function getTokenType()
     {
         if ($this->hasSessionFacade) {
-            return session()->get(Config::get('auth_abc.session.token_type'));
+            return session()->get(Config::get('sag.session.token_type'));
         }
 
         return null;
@@ -45,7 +45,7 @@ class JWTService
     public function getTokenValidade()
     {
         if ($this->hasSessionFacade) {
-            return session()->get(Config::get('auth_abc.session.token_validate'));
+            return session()->get(Config::get('sag.session.token_validate'));
         }
 
         return null;

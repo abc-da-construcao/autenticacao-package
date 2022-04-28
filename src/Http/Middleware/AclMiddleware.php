@@ -17,6 +17,8 @@ class AclMiddleware
     public function handle(Request $request, \Closure $next, $guard = null)
     {
         $response = $next($request);
+        $authCheck = Auth::guard($guard)->check();
+        $user = Auth::guard($guard)->user();
         $currentRoute = ACL::normalizeRouteByRequest($request);
 
         if (empty($currentRoute)) {
@@ -24,12 +26,23 @@ class AclMiddleware
         }
 
         foreach (ACL::getMapRoutes() as $mapRoute) {
-            if (ACL::routeMethodsToString($currentRoute->methods) == $mapRoute->method && $currentRoute->uri == $mapRoute->uri) {
-                if (Auth::guard($guard)->check() && ACL::validate($mapRoute, Auth::guard($guard)->user())) {
+            if (ACL::routeMethodsToString($currentRoute->methods) == $mapRoute->method
+                && $currentRoute->uri == $mapRoute->uri) {
+                if ($authCheck && ACL::isAuthSagJwtDriver($request) && ACL::validate($mapRoute, $user)) {
                     return $response;
-                } elseif (!Auth::guard($guard)->check() && !$mapRoute->public) {
+                }
+
+                $appIsActive = ACL::appIsActive();
+
+                if ($authCheck && !ACL::isAuthSagJwtDriver($request) && $appIsActive) {
+                    return $response;
+                }
+
+                if (!$authCheck && ACL::isAuthSagJwtDriver($request) && !$mapRoute->public) {
                     return $this->unauthorized($request);
-                } elseif ($mapRoute->public && ACL::appIsActive()) {
+                }
+
+                if ($mapRoute->public && $appIsActive) {
                     return $response;
                 }
             }
@@ -48,7 +61,7 @@ class AclMiddleware
             return response()->json(['message' => 'Ação não autorizada.'], 403);
         }
 
-        $sessionKey = Config::get('auth_abc.session.acl_error');
+        $sessionKey = Config::get('sag.session.acl_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Ação não autorizada.');
@@ -67,7 +80,7 @@ class AclMiddleware
             return response()->json(['message' => 'Usuário não autenticado.'], 401);
         }
 
-        $sessionKey = Config::get('auth_abc.session.acl_error');
+        $sessionKey = Config::get('sag.session.acl_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Usuário não autenticado.');
@@ -82,7 +95,7 @@ class AclMiddleware
             return response()->json(['message' => 'Url inválida.'], 404);
         }
 
-        $sessionKey = Config::get('auth_abc.session.acl_error');
+        $sessionKey = Config::get('sag.session.acl_error');
 
         if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
             return back()->with($sessionKey, 'Url inválida.');

@@ -3,6 +3,7 @@
 namespace AbcDaConstrucao\AutenticacaoPackage\Facades;
 
 use AbcDaConstrucao\AutenticacaoPackage\Services\AclService;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 
 /**
@@ -13,6 +14,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService syncRoutes()
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService validate(object $mapRoute, $user)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService appIsActive()
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService isAuthSagJwtDriver(Request $request)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService hasRouteAccess(string $routeNameOrUri)
  *
  * @see AbcDaConstrucao\AutenticacaoPackage\Services\AclService

@@ -80,13 +80,9 @@ as linhas correspondentes ao `provider`.
 ```PHP
 //...
 'guards' => [
-    'web' => [
-        'driver' => 'jwt',
-        //'provider' => 'users',
-    ],
-    'api' => [
-        'driver' => 'jwt',
-        //'provider' => 'users',
+    // ...
+    'sag' => [
+        'driver' => 'sag-jwt'
     ],
 ]
 //...
@@ -104,7 +100,8 @@ Abra o arquivo `config/auth.php` e altere o driver de autenticação para `jwt`.
 
 ```PHP
 'guards' => [
-    'api' => ['driver' => 'jwt']
+    // ...
+    'sag' => ['driver' => 'sag-jwt'],
 ]
 ```
 
@@ -186,17 +183,12 @@ Exemplo de grupo de rotas protegidas por autenticação.
 
 ```PHP
 // Lumen
-$router->group(['middleware' => ['auth']], function () use ($router) {
-    // Routes
-});
-
-// Laravel WEB
-Route::middleware(['auth'])->group(function () {
+$router->group(['middleware' => ['auth:sag']], function () use ($router) {
     // Routes
 });
 
 // Laravel API
-Route::middleware(['auth:api'])->group(function () {
+Route::middleware(['auth:sag'])->group(function () {
     // Routes
 });
 ```
@@ -258,9 +250,9 @@ Posteriormente poderá acessar o token e passar nas requisições seguintes para
 ```PHP
 use Illuminate\Support\Facades\Config;
 
-$token = session()->get(Config::get('auth_abc.session.token'));
-$tokenType = session()->get(Config::get('auth_abc.session.token_type'));
-$tokenValidate = session()->get(Config::get('auth_abc.session.token_validate'));
+$token = session()->get(Config::get('sag.session.token'));
+$tokenType = session()->get(Config::get('sag.session.token_type'));
+$tokenValidate = session()->get(Config::get('sag.session.token_validate'));
 ```
 
 <br>
@@ -270,11 +262,12 @@ $tokenValidate = session()->get(Config::get('auth_abc.session.token_validate'));
 ```PHP
 // statuscode 200
 [
-    'status' => 200,
-    'data' => [
-        'token_tipo' => 'Bearer',
-        'token_validade' => '2022-02-11T21:49:35-03:00',
-        'token' => 'eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMFwvYXBpXC9hdXRoXC9sb2dpbiIsImlhdCI6MTY0NDYwODk3NSwiZXhwIjoxNjQ0NjI2OTc1LCJuYmYiOjE2NDQ2MDg5NzUsImp0aSI6IlhXT0M5QWRDcGZWZW5WWGQiLCJzdWIiOjMsInBydiI6ImYzNzVlYWVkMGM2ZjE2YjJjOWUyYmY1NzE2YzUwMTZiNzUwZjI1NjcifQ.5YrwxDYLNzpt1xnnX5jyVtoEUIMkYfrpDykqNsLTY0g',
+    "status" => 200,
+    "data" => [
+        "token_tipo" => "Bearer",
+        "token_validade" =>  "2022-04-28T17:49:21-03:00",
+        "token" => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJodHRwOlwvXC9zYWctc2VydmVyLmxvY2FsXC9hdXRoXC9sb2dpbiIsImlhdCI6MTY1MTE3NTIzOCwiZXhwIjoxNjUxMTc4ODM4LCJqaXQiOiJqd3RfNSIsInN1YiI6NX0.aSYc0iMkPzVb2EluK7rtXwnkjfv0TdjFFFHuSvd7VMQ",
+        "payload" => "eyJpZCI6NSwibmFtZSI6IlRhbGxlcyBHYXplbCIsInVzZXJuYW1lIjoidGFsbGVzIiwiZW1haWwiOiJ0YWxsZXMuZ2F6ZWxAYWJjZGFjb25zdHJ1Y2FvLmNvbS5iciIsImVtYWlsX3ZlcmlmaWVkX2F0IjpudWxsLCJwYXNzd29yZCI6IiQyeSQxMCRnTGF0dk9zcmYwb25PUElodzV1N2hlRTFlTXNZb1Bta3M1cU5EMVdpc0x6bmZnSkdYNHUuZSIsImFjdGl2ZSI6MSwicm9vdCI6MCwiZXhwaXJlIjoxLCJjcmVhdGVkX2J5IjoxLCJ1cGRhdGVkX2J5IjoxLCJyZW1lbWJlcl90b2tlbiI6bnVsbCwiY3JlYXRlZF9hdCI6IjIwMjItMDQtMjggMTU6MDI6NDQiLCJ1cGRhdGVkX2F0IjoiMjAyMi0wNC0yOCAxNTowMzowMyIsImFwcHMiOlt7ImlkIjoxLCJuYW1lIjoiYXBpX3BlZGlkb3Nfc2VydmVyLXByb2R1Y3Rpb24iLCJ1cmwiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMSIsImFjdGl2ZSI6MSwic3VwZXJfYWRtaW4iOjAsImNyZWF0ZWRfYnkiOjEsInVwZGF0ZWRfYnkiOjEsImNyZWF0ZWRfYXQiOiIyMDIyLTA0LTI4IDEwOjM4OjU2IiwidXBkYXRlZF9hdCI6IjIwMjItMDQtMjggMTA6Mzg6NTYiLCJncm91cHMiOlt7ImlkIjoyLCJhcHBfaWQiOjEsIm5hbWUiOiJGQVJNIiwiZGVzY3JpcHRpb24iOiJHcnVwbyBkbyBSYW1vbiIsImFjdGl2ZSI6MSwiY3JlYXRlZF9ieSI6MSwidXBkYXRlZF9ieSI6MSwiY3JlYXRlZF9hdCI6IjIwMjItMDQtMjggMTU6MDI6MDciLCJ1cGRhdGVkX2F0IjoiMjAyMi0wNC0yOCAxNTowMjowNyIsInBlcm1pc3Npb25zIjpbeyJhcHBfaWQiOjEsImdyb3VwX2lkIjoyLCJpZCI6NCwibWV0aG9kIjoiUE9TVCIsInVyaSI6IlwvbG9nb3V0IiwibmFtZSI6ImxvZ291dCIsInB1YmxpYyI6MH0seyJhcHBfaWQiOjEsImdyb3VwX2lkIjoyLCJpZCI6MywibWV0aG9kIjoiR0VUIiwidXJpIjoiXC9wcm9maWxlIiwibmFtZSI6InByb2ZpbGUiLCJwdWJsaWMiOjB9XX1dLCJyb3V0ZXMiOlt7ImlkIjoxLCJhcHBfaWQiOjEsIm1ldGhvZCI6IlBPU1QiLCJ1cmkiOiJcL2xvZ2luIiwibmFtZSI6ImxvZ2luIiwicHVibGljIjoxfSx7ImlkIjoyLCJhcHBfaWQiOjEsIm1ldGhvZCI6IkdFVCIsInVyaSI6Ilwvcm90YS1wdWJsaWNhIiwibmFtZSI6InJvdGEtcHVibGljYSIsInB1YmxpYyI6MX0seyJpZCI6MywiYXBwX2lkIjoxLCJtZXRob2QiOiJHRVQiLCJ1cmkiOiJcL3Byb2ZpbGUiLCJuYW1lIjoicHJvZmlsZSIsInB1YmxpYyI6MH0seyJpZCI6NCwiYXBwX2lkIjoxLCJtZXRob2QiOiJQT1NUIiwidXJpIjoiXC9sb2dvdXQiLCJuYW1lIjoibG9nb3V0IiwicHVibGljIjowfSx7ImlkIjo1LCJhcHBfaWQiOjEsIm1ldGhvZCI6IkdFVCIsInVyaSI6IlwvIiwibmFtZSI6ImhvbWUiLCJwdWJsaWMiOjB9XX0seyJpZCI6MywibmFtZSI6ImFwaV9wZWRpZG9zX2Zyb250LXByb2R1Y3Rpb24iLCJ1cmwiOiJodHRwOlwvXC9sb2NhbGhvc3Q6ODAwMiIsImFjdGl2ZSI6MSwic3VwZXJfYWRtaW4iOjAsImNyZWF0ZWRfYnkiOjEsInVwZGF0ZWRfYnkiOjEsImNyZWF0ZWRfYXQiOiIyMDIyLTA0LTI4IDE1OjMyOjI5IiwidXBkYXRlZF9hdCI6IjIwMjItMDQtMjggMTU6MzI6MjkiLCJncm91cHMiOlt7ImlkIjozLCJhcHBfaWQiOjMsIm5hbWUiOiJGQVJNIiwiZGVzY3JpcHRpb24iOm51bGwsImFjdGl2ZSI6MSwiY3JlYXRlZF9ieSI6MSwidXBkYXRlZF9ieSI6MSwiY3JlYXRlZF9hdCI6IjIwMjItMDQtMjggMTU6MzM6NDMiLCJ1cGRhdGVkX2F0IjoiMjAyMi0wNC0yOCAxNTozMzo0MyIsInBlcm1pc3Npb25zIjpbeyJhcHBfaWQiOjMsImdyb3VwX2lkIjozLCJpZCI6MTEsIm1ldGhvZCI6IkdFVHxIRUFEIiwidXJpIjoiXC9hcGlcL2hvbWUiLCJuYW1lIjoiYXBpLmhvbWUiLCJwdWJsaWMiOjB9LHsiYXBwX2lkIjozLCJncm91cF9pZCI6MywiaWQiOjksIm1ldGhvZCI6IlBPU1QiLCJ1cmkiOiJcL2FwaVwvbG9nb3V0IiwibmFtZSI6ImFwaS5sb2dvdXQiLCJwdWJsaWMiOjB9LHsiYXBwX2lkIjozLCJncm91cF9pZCI6MywiaWQiOjEwLCJtZXRob2QiOiJHRVR8SEVBRCIsInVyaSI6IlwvYXBpXC9wcm9maWxlIiwibmFtZSI6ImFwaS5wcm9maWxlIiwicHVibGljIjowfSx7ImFwcF9pZCI6MywiZ3JvdXBfaWQiOjMsImlkIjoxNSwibWV0aG9kIjoiR0VUfEhFQUQiLCJ1cmkiOiJcL2hvbWUiLCJuYW1lIjoiaG9tZSIsInB1YmxpYyI6MH0seyJhcHBfaWQiOjMsImdyb3VwX2lkIjozLCJpZCI6MTYsIm1ldGhvZCI6IkdFVHxIRUFEIiwidXJpIjoiXC9sb2dvdXQiLCJuYW1lIjoibG9nb3V0IiwicHVibGljIjowfV19XSwicm91dGVzIjpbeyJpZCI6NiwiYXBwX2lkIjozLCJtZXRob2QiOiJHRVR8SEVBRCIsInVyaSI6Ilwvc2FuY3R1bVwvY3NyZi1jb29raWUiLCJuYW1lIjpudWxsLCJwdWJsaWMiOjF9LHsiaWQiOjcsImFwcF9pZCI6MywibWV0aG9kIjoiR0VUfEhFQUQiLCJ1cmkiOiJcL2FwaVwvcHVibGljYSIsIm5hbWUiOiJhcGkucHVibGljYSIsInB1YmxpYyI6MX0seyJpZCI6OCwiYXBwX2lkIjozLCJtZXRob2QiOiJQT1NUIiwidXJpIjoiXC9hcGlcL2xvZ2luIiwibmFtZSI6ImFwaS5sb2dpbiIsInB1YmxpYyI6MX0seyJpZCI6OSwiYXBwX2lkIjozLCJtZXRob2QiOiJQT1NUIiwidXJpIjoiXC9hcGlcL2xvZ291dCIsIm5hbWUiOiJhcGkubG9nb3V0IiwicHVibGljIjowfSx7ImlkIjoxMCwiYXBwX2lkIjozLCJtZXRob2QiOiJHRVR8SEVBRCIsInVyaSI6IlwvYXBpXC9wcm9maWxlIiwibmFtZSI6ImFwaS5wcm9maWxlIiwicHVibGljIjowfSx7ImlkIjoxMSwiYXBwX2lkIjozLCJtZXRob2QiOiJHRVR8SEVBRCIsInVyaSI6IlwvYXBpXC9ob21lIiwibmFtZSI6ImFwaS5ob21lIiwicHVibGljIjowfSx7ImlkIjoxMiwiYXBwX2lkIjozLCJtZXRob2QiOiJHRVR8SEVBRCIsInVyaSI6IlwvIiwibmFtZSI6InN0YXJ0IiwicHVibGljIjoxfSx7ImlkIjoxMywiYXBwX2lkIjozLCJtZXRob2QiOiJHRVR8SEVBRCIsInVyaSI6IlwvbG9naW4iLCJuYW1lIjoibG9naW4iLCJwdWJsaWMiOjF9LHsiaWQiOjE0LCJhcHBfaWQiOjMsIm1ldGhvZCI6IlBPU1QiLCJ1cmkiOiJcL2xvZ2luIiwibmFtZSI6InBvc3QubG9naW4iLCJwdWJsaWMiOjF9LHsiaWQiOjE1LCJhcHBfaWQiOjMsIm1ldGhvZCI6IkdFVHxIRUFEIiwidXJpIjoiXC9ob21lIiwibmFtZSI6ImhvbWUiLCJwdWJsaWMiOjB9LHsiaWQiOjE2LCJhcHBfaWQiOjMsIm1ldGhvZCI6IkdFVHxIRUFEIiwidXJpIjoiXC9sb2dvdXQiLCJuYW1lIjoibG9nb3V0IiwicHVibGljIjowfV19XX0="
     ]
 ]
 
@@ -312,8 +305,7 @@ Após autenticação, os dados do usuário estarão disponíveis na facade `Auth
 ```PHP
 use Illuminate\Support\Facades\Auth;
 
-$user = Auth::user(); // API Lumen ou Frontend Laravel 
-$user = Auth::guard('api')->user(); // API Laravel
+$user = Auth::guard('sag')->user();
 
 dd($user->toArray());
 // result
@@ -325,6 +317,7 @@ dd($user->toArray());
   'email_verified_at' => '2022-02-09 18:04:12',
   'active' => '1',
   'root' => '0',
+  'expire' => '1',
   'created_by' => '1',
   'updated_by' => '1',
   'created_at' => '2022-02-09 21:04:12',
@@ -532,5 +525,5 @@ ACL::hasRouteAccess('/api/profile');
 Após criar ou atualizar as rotas da aplicação deve-se usar o command de sincronização.
 
 ```
-php artisan abc-auth:sync-routes
+php artisan abc-sag:sync-routes
 ```

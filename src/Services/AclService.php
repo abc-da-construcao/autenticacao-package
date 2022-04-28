@@ -36,15 +36,7 @@ class AclService
                 'uri' => $route->uri,
                 'name' => $route->name,
             ];
-
-            if (in_array('auth', $route->action['middleware'])
-                || in_array('auth:web', $route->action['middleware'])
-                || in_array('auth:api', $route->action['middleware'])) {
-                $map[$index]->public = false;
-            } else {
-                $map[$index]->public = true;
-            }
-
+            $map[$index]->public = count(preg_grep("/auth/", $route->action['middleware'])) === 0;
             $index++;
         }
 
@@ -143,7 +135,7 @@ class AclService
             return false;
         }
 
-        $appName = Config::get('auth_abc.app_name');
+        $appName = Config::get('sag.app_name');
         $app = collect($user->apps)->firstWhere('name', $appName);
 
         if (empty($app) || $app['active'] == 0) {
@@ -180,6 +172,32 @@ class AclService
 
         if (isset($resp['status']) && $resp['status'] == 200 && $resp['data'] == true) {
             return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param Request $request
+     * @return bool
+     */
+    public function isAuthSagJwtDriver(Request $request)
+    {
+        $route = self::normalizeRouteByRequest($request);
+        $authMiddlewareArray = preg_grep("/auth/", $route->action['middleware']);
+
+        if (empty($authMiddlewareArray)) {
+            return false;
+        }
+
+        $array = explode(':', $authMiddlewareArray[array_key_first($authMiddlewareArray)]);
+
+        if (count($array) == 2) {
+            return 'sag-jwt' === Config::get("auth.guards.{$array[1]}.driver");
+        } elseif (count($array) == 1) {
+            $guard = Config::get("auth.defaults.guard");
+
+            return 'sag-jwt' === Config::get("auth.guards.{$guard}.driver");
         }
 
         return false;

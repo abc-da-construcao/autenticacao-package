@@ -40,9 +40,9 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function boot()
     {
-        $config = __DIR__ . '/../../config/auth_abc.php';
-        $this->mergeConfigFrom($config, 'auth_abc');
-        $this->publishes([$config => $this->app->configPath('auth_abc.php')], 'abc_auth:config');
+        $config = __DIR__ . '/../../config/sag.php';
+        $this->mergeConfigFrom($config, 'sag');
+        $this->publishes([$config => $this->app->configPath('sag.php')], 'sag:config');
         $this->registerJwtAuthGuard();
         $this->registerAclMiddleware();
         $this->registerCommands();
@@ -93,7 +93,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function registerJwtAuthGuard()
     {
-        $this->app['auth']->viaRequest('jwt', function (Request $request) {
+        $this->app['auth']->viaRequest('sag-jwt', function (Request $request) {
             // Busca token da sessão caso exita.
             $tokenTipo = JWT::getTokenType();
             $token = JWT::getToken();
@@ -124,7 +124,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected function mergeLocalUser(array $user)
     {
-        $config = Config::get('auth_abc');
+        $config = Config::get('sag');
 
         if (!empty($config['user_local_class']) && class_exists($config['user_local_class'])
             && in_array(MergeLocalUserInterface::class, class_implements($config['user_local_class']))
