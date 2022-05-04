@@ -204,6 +204,30 @@ class AclService
     }
 
     /**
+     * @param Request $request
+     * @return string|null
+     */
+    public function getGuard(Request $request)
+    {
+        $route = self::normalizeRouteByRequest($request);
+        $authMiddlewareArray = preg_grep("/auth/", $route->action['middleware']);
+
+        if (empty($authMiddlewareArray)) {
+            return null;
+        }
+
+        $array = explode(':', $authMiddlewareArray[array_key_first($authMiddlewareArray)]);
+
+        if (count($array) == 2) {
+            return $array[1];
+        } elseif (count($array) == 1) {
+            return Config::get("auth.defaults.guard");
+        }
+
+        return null;
+    }
+
+    /**
      * @param string $routeNameOrUri
      * @param string $guard
      * @return bool

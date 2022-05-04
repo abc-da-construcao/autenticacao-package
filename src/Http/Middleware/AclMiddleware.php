@@ -17,8 +17,8 @@ class AclMiddleware
     public function handle(Request $request, \Closure $next, $guard = null)
     {
         $response = $next($request);
-        $authCheck = Auth::guard($guard)->check();
-        $user = Auth::guard($guard)->user();
+        $user = Auth::guard($guard ?? ACL::getGuard($request))->user();
+        $authCheck = !empty($user);
         $currentRoute = ACL::normalizeRouteByRequest($request);
 
         if (empty($currentRoute)) {
