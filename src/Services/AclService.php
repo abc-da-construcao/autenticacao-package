@@ -104,6 +104,25 @@ class AclService
     }
 
     /**
+     * @param string $currentUri
+     * @param string $mappedUri
+     * @return boolean
+     */
+    public function compareUriElements(string $currentUri, string $mappedUri)
+    {
+        $currentUriArray = explode('/', $currentUri);
+        $mappedUriArray = explode('/', $mappedUri);
+        $uriElementsDifferent = array_diff($mappedUriArray,$currentUriArray);
+        $resultCompare = true;
+
+        foreach($uriElementsDifferent as $uriElement) {
+            $resultCompare = strstr($uriElement, '{');
+        }
+
+        return $resultCompare;
+    }
+
+    /**
      * @return \AbcDaConstrucao\AutenticacaoPackage\Services\HttpClientService
      */
     public function syncRoutes()
