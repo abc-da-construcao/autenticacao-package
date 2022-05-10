@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Facade;
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService getMapRoutes()
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService normalizeRouteByFacade($route)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService normalizeRouteByRequest($route)
+ * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService compareUriElements(string $currentUri, string $mappedUri)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService routeMethodsToString(array $methods)
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService syncRoutes()
  * @method static \AbcDaConstrucao\AutenticacaoPackage\Services\AclService validate(object $mapRoute, $user)

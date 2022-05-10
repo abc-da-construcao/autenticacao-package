@@ -238,7 +238,7 @@ class HttpClientService
                 return false;
             }
 
-            $resp = $this->guzzle->request('GET', 'auth/update-password', [
+            $resp = $this->guzzle->request('PUT', 'auth/password/update', [
                 'headers' => [
                     'Authorization' => "{$tokenTipo} {$token}",
                 ],

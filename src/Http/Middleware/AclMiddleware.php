@@ -27,7 +27,7 @@ class AclMiddleware
 
         foreach (ACL::getMapRoutes() as $mapRoute) {
             if (ACL::routeMethodsToString($currentRoute->methods) == $mapRoute->method
-                && $currentRoute->uri == $mapRoute->uri) {
+                && ACL::compareUriElements($currentRoute->uri, $mapRoute->uri)) {
                 if ($authCheck && ACL::isAuthSagJwtDriver($request) && ACL::validate($mapRoute, $user)) {
                     return $response;
                 }
