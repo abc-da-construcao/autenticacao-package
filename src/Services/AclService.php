@@ -112,14 +112,14 @@ class AclService
     {
         $currentUriArray = explode('/', $currentUri);
         $mappedUriArray = explode('/', $mappedUri);
-        $uriElementsDifferent = array_diff($mappedUriArray,$currentUriArray);
-        $resultCompare = true;
 
-        foreach($uriElementsDifferent as $uriElement) {
-            $resultCompare = strstr($uriElement, '{');
+        for ($i = 0; $i < count($currentUriArray); $i++) {
+            if (($currentUriArray[$i] != $mappedUriArray[$i]) && !strstr($mappedUriArray[$i], '{')) {
+                return false;
+            }
         }
 
-        return $resultCompare;
+        return true;
     }
 
     /**
@@ -172,7 +172,9 @@ class AclService
         foreach ($app['groups'] as $group) {
             if ($group['active'] == 1) {
                 foreach ($group['permissions'] as $route) {
-                    if ($mapRoute->method == $route['method'] && $mapRoute->uri == $route['uri']) {
+                    if ($mapRoute->method == $route['method'] &&
+                        $this->compareUriElements($mapRoute->uri, $route['uri'])
+                    ) {
                         return true;
                     }
                 }
@@ -229,6 +231,11 @@ class AclService
     public function getGuard(Request $request)
     {
         $route = self::normalizeRouteByRequest($request);
+
+        if (empty($route)) {
+            return null;
+        }
+
         $authMiddlewareArray = preg_grep("/auth/", $route->action['middleware']);
 
         if (empty($authMiddlewareArray)) {
@@ -257,7 +264,7 @@ class AclService
         $route = null;
 
         foreach ($this->getMapRoutes() as $mapRoute) {
-            if ($mapRoute->name == $routeNameOrUri || $mapRoute->uri == $routeNameOrUri) {
+            if ($mapRoute->name == $routeNameOrUri || $this->compareUriElements($mapRoute->uri, $routeNameOrUri)) {
                 $route = $mapRoute;
             }
         };
