@@ -23,40 +23,73 @@ Facade e commands para uso do Sistema de Autenticação Global nos padrões ABC.
 <br/>
 
 ## Instalação
-Este repositório é privado, portanto você deve criar ou informar uma chave rsa para acesso SSH
-e ter um Token de acesso pessoal para conseguir instalar esse pacote.
 
-> Veja mais informações: <br>
-> - <a href="https://docs.github.com/pt/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account" target="_blank">Adicionar uma nova chave SSH a sua conta GitHub</a>
-> - <a href="https://docs.github.com/pt/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token" target="_blank">Criar um token de acesso pessoal a sua conta GitHub</a>
+[//]: # (Este repositório é privado, portanto você deve criar ou informar uma chave rsa para acesso SSH)
 
-```
-// Criando uma chave SSH no Servidor
+[//]: # (e ter um Token de acesso pessoal para conseguir instalar esse pacote.)
 
-cd ~/.ssh
-ssh-keygen -t rsa -b 4096 -C "your_email@example.com"
-```
-Após gerar a chave adicione a mesma a sua conta github.
+[//]: # ()
+[//]: # (> Veja mais informações: <br>)
 
-Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.
-```
-{
-  //...
-  "repositories": [
-    {
-      "type": "vcs",
-      "url": "git@github.com:abc-da-construcao/autenticacao-package.git"
-    }
-  ],
-  //...
-}
-```
+[//]: # (> - <a href="https://docs.github.com/pt/authentication/connecting-to-github-with-ssh/adding-a-new-ssh-key-to-your-github-account" target="_blank">Adicionar uma nova chave SSH a sua conta GitHub</a>)
 
-Em seguida use o comando abaixo. Será solicitado seu Personal Token a primeira vez que instalar o pacote.
+[//]: # (> - <a href="https://docs.github.com/pt/authentication/keeping-your-account-and-data-secure/creating-a-personal-access-token" target="_blank">Criar um token de acesso pessoal a sua conta GitHub</a>)
+
+[//]: # ()
+[//]: # (```)
+
+[//]: # (// Criando uma chave SSH no Servidor)
+
+[//]: # ()
+[//]: # (cd ~/.ssh)
+
+[//]: # (ssh-keygen -t rsa -b 4096 -C "your_email@example.com")
+
+[//]: # (```)
+
+[//]: # (Após gerar a chave adicione a mesma a sua conta github.)
+
+[//]: # ()
+[//]: # (Adicione as seguintes chaves no `composer.json` do seu projeto Laravel ou Lumen.)
+
+[//]: # (```)
+
+[//]: # ({)
+
+[//]: # (  //...)
+
+[//]: # (  "repositories": [)
+
+[//]: # (    {)
+
+[//]: # (      "type": "vcs",)
+
+[//]: # (      "url": "git@github.com:abc-da-construcao/autenticacao-package.git")
+
+[//]: # (    })
+
+[//]: # (  ],)
+
+[//]: # (  //...)
+
+[//]: # (})
+
+[//]: # (```)
+
+[//]: # ()
+[//]: # (Em seguida use o comando abaixo. Será solicitado seu Personal Token a primeira vez que instalar o pacote.)
+
+[//]: # (```shell)
+
+[//]: # (composer require abc-da-construcao/autenticacao-package)
+
+[//]: # (```)
+
+Use o comando abaixo.
+
 ```shell
 composer require abc-da-construcao/autenticacao-package
 ```
-
 <br/>
 
 ## Configuração
