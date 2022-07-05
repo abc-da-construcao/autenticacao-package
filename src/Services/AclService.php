@@ -150,7 +150,7 @@ class AclService
      */
     public function validate(object $mapRoute, $user)
     {
-        if ($user->active == 0) {
+        if (!empty($user->active) && $user->active == 0) {
             return false;
         }
 
@@ -253,7 +253,7 @@ class AclService
      */
     public function hasRouteAccess(string $routeNameOrUri, string $guard = 'web')
     {
-        $user = Auth::guard($guard)->user() ?? Auth::guard('api')->user();
+        $user = Auth::guard('sag')->user();
         $route = null;
 
         foreach ($this->getMapRoutes() as $mapRoute) {
