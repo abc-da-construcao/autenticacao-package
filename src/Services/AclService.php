@@ -111,11 +111,11 @@ class AclService
     public function compareUriElements(string $currentUri, string $mappedUri)
     {
         if ('/' == substr($currentUri, -1)) {
-            $currentUri = substr($currentUri, -1);
+            $currentUri = substr($currentUri, 0,-1);
         }
 
         if ('/' == substr($mappedUri, -1)) {
-            $mappedUri = substr($mappedUri, -1);
+            $mappedUri = substr($mappedUri, 0,-1);
         }
 
         $currentUriArray = explode('/', $currentUri);
