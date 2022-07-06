@@ -110,16 +110,29 @@ class AclService
      */
     public function compareUriElements(string $currentUri, string $mappedUri)
     {
+        if ('/' == substr($currentUri, -1)) {
+            $currentUri = substr($currentUri, -1);
+        }
+
+        if ('/' == substr($mappedUri, -1)) {
+            $mappedUri = substr($mappedUri, -1);
+        }
+
         $currentUriArray = explode('/', $currentUri);
         $mappedUriArray = explode('/', $mappedUri);
 
-        for ($i = 0; $i < count($currentUriArray); $i++) {
-            if (($currentUriArray[$i] != $mappedUriArray[$i]) && !strstr($mappedUriArray[$i], '{')) {
-                return false;
-            }
+        if (count($currentUriArray) != count($mappedUriArray)) {
+            return false;
         }
 
-        return true;
+        $uriElementsDifferent = array_diff($mappedUriArray,$currentUriArray);
+        $resultCompare = true;
+
+        foreach ($uriElementsDifferent as $uriElement) {
+            $resultCompare = strstr($uriElement, '{');
+        }
+
+        return $resultCompare;
     }
 
     /**
