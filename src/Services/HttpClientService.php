@@ -5,20 +5,17 @@ namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 use AbcDaConstrucao\AutenticacaoPackage\Facades\JWT;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 class HttpClientService
 {
     protected $config;
-    protected $hasSessionFacade;
     protected Client $guzzle;
 
     public function __construct()
     {
         $this->config = Config::get('sag');
-        /*$this->hasSessionFacade = class_exists('Illuminate\Support\Facades\Session')
-            && !class_exists('Laravel\Lumen\Application');*/
-        $this->hasSessionFacade = function_exists('session');
         $this->setGuzzle();
     }
 
@@ -82,16 +79,12 @@ class HttpClientService
 
             $body = json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents();
 
-            if ($this->hasSessionFacade && isset($body['token'])) {
-                session([
-                    $this->config['session']['token_type'] => $body['token_tipo'],
-                    $this->config['session']['token_validate'] => $body['token_validade'],
-                    $this->config['session']['token'] => $body['token']
-                ]);
-            } elseif ($this->hasSessionFacade && session()->has($this->config['session']['token'])) {
-                session()->forget($this->config['session']['token_type']);
-                session()->forget($this->config['session']['token_validate']);
-                session()->forget($this->config['session']['token']);
+            if (isset($body['token'])) {
+                Cache::put($this->config['session']['token_type'], $body['token_tipo']);
+                Cache::put($this->config['session']['token_validate'], $body['token_validade']);
+                Cache::put($this->config['session']['token'], $body['token']);
+            } else {
+                JWT::forgetToken();
             }
 
             return [
@@ -127,16 +120,12 @@ class HttpClientService
 
             $body = json_decode($resp->getBody()->getContents(), true) ?? $resp->getBody()->getContents();
 
-            if ($this->hasSessionFacade && isset($body['token'])) {
-                session([
-                    $this->config['session']['token_type'] => $body['token_tipo'],
-                    $this->config['session']['token_validate'] => $body['token_validade'],
-                    $this->config['session']['token'] => $body['token']
-                ]);
-            } elseif ($this->hasSessionFacade && session()->has($this->config['session']['token'])) {
-                session()->forget($this->config['session']['token_type']);
-                session()->forget($this->config['session']['token_validate']);
-                session()->forget($this->config['session']['token']);
+            if (isset($body['token'])) {
+                Cache::put($this->config['session']['token_type'], $body['token_tipo']);
+                Cache::put($this->config['session']['token_validate'], $body['token_validade']);
+                Cache::put($this->config['session']['token'], $body['token']);
+            } else {
+                JWT::forgetToken();
             }
 
             return [
@@ -174,12 +163,8 @@ class HttpClientService
             ]);
 
             if (in_array($resp->getStatusCode(), [200, 201])
-                && $this->hasSessionFacade
-                && session()->has($this->config['session']['token'])
             ) {
-                session()->forget($this->config['session']['token_type']);
-                session()->forget($this->config['session']['token_validate']);
-                session()->forget($this->config['session']['token']);
+                JWT::forgetToken();
             }
 
             return [

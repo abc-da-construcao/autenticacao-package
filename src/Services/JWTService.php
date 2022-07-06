@@ -3,28 +3,17 @@
 namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 
 use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
 
 class JWTService
 {
-    protected $hasSessionFacade;
-
-    public function __construct()
-    {
-        $this->hasSessionFacade = class_exists('Illuminate\Support\Facades\Session')
-            && !class_exists('Laravel\Lumen\Application');
-    }
-
     /**
      * @return mixed
      */
     public function getToken()
     {
-        if ($this->hasSessionFacade) {
-            return session()->get(Config::get('sag.session.token'));
-        }
-
-        return null;
+        return Cache::get(Config::get('sag.session.token'));
     }
 
     /**
@@ -32,11 +21,7 @@ class JWTService
      */
     public function getTokenType()
     {
-        if ($this->hasSessionFacade) {
-            return session()->get(Config::get('sag.session.token_type'));
-        }
-
-        return null;
+        return Cache::get(Config::get('sag.session.token_type'));
     }
 
     /**
@@ -44,11 +29,17 @@ class JWTService
      */
     public function getTokenValidade()
     {
-        if ($this->hasSessionFacade) {
-            return session()->get(Config::get('sag.session.token_validate'));
-        }
+        return Cache::get(Config::get('sag.session.token_validate'));
+    }
 
-        return null;
+    /**
+     * @return void
+     */
+    public function forgetToken()
+    {
+        Cache::forget(Config::get('sag.session.token_type'));
+        Cache::forget(Config::get('sag.session.token_validate'));
+        Cache::forget(Config::get('sag.session.token'));
     }
 
     /**

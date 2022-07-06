@@ -255,7 +255,7 @@ $router->post('/login', function (Request $request) {
 
 **Exemplo em Frontend Laravel/Lumen** <br>
 
-O método `Http::loginRequest()` também salva o token em sessão caso exista a classe `Illuminate\Session\SessionManager`,
+O método `Http::loginRequest()` também salva o token em cache,
 facilitando o manuseio do mesmo e mantendo o usuário logado enquanto o token for válido.
  
 ```PHP
@@ -282,10 +282,11 @@ Posteriormente poderá acessar o token e passar nas requisições seguintes para
 
 ```PHP
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Cache;
 
-$token = session()->get(Config::get('sag.session.token'));
-$tokenType = session()->get(Config::get('sag.session.token_type'));
-$tokenValidate = session()->get(Config::get('sag.session.token_validate'));
+$token = Cache::get(Config::get('sag.session.token'));
+$tokenType = Cache::get(Config::get('sag.session.token_type'));
+$tokenValidate = Cache::get(Config::get('sag.session.token_validate'));
 ```
 
 <br>
@@ -486,11 +487,17 @@ Agora ao acessar a facade `Auth` as chaves adicionais do usuário estarão acess
 
 ### Método auxiliar para logout
 
-`Http::logoutRequest($tokenTipo, $token);` <br>
+`Http::logoutRequest($tokenTipo, $token);` invalida o token no sag em todas as aplicações.<br>
+`JWT::forgetToken();` remove o token apenas no cache da aplicação atual mas não invalida o token no SAG. As outras aplicações
+continuarão logadas.<br>
 
 **Aplicações API**
 
+Logout Global
+
 ```PHP
+use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
+
 $router->post('/logout', ['as' => 'logout', function (Request $request) {
     $header = $request->header('Authorization');
     $token = explode(' ', $header);
@@ -504,10 +511,13 @@ $router->post('/logout', ['as' => 'logout', function (Request $request) {
 
 **Para aplicações Frontend Laravel/Lumen** <br>
 
-Será removido as chaves de sessão que contém o token.
+**Logout Global**
 
 ```PHP
+use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
+
 Route::post('/logout', ['as' => 'logout', function (Request $request) {
+
     $response = Http::logoutRequest();
 
     // Redireciona a página desejada.
@@ -520,8 +530,6 @@ Route::post('/logout', ['as' => 'logout', function (Request $request) {
 }]);
 ```
 
-<br>
-
 **Resultado esperado em $response.** <br>
 ```PHP
 [
@@ -531,6 +539,21 @@ Route::post('/logout', ['as' => 'logout', function (Request $request) {
     ]
 ]
 ```
+
+**Logout aplicação Local**
+
+```PHP
+use AbcDaConstrucao\AutenticacaoPackage\Facades\JWT;
+
+Route::post('/logout', ['as' => 'logout', function (Request $request) {
+
+    JWT::forgetToken();
+    
+    return redirect()->route('login');
+}]);
+```
+
+<br>
 
 ### Método auxiliar para verificar permissão de acesso
 O método `ACL::hasRouteAccess(string $routeNameOrUri)` recebe o `nome` ou a `uri` de uma rota e retorna boolean se o usuário
