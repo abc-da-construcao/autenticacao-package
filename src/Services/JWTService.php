@@ -3,17 +3,28 @@
 namespace AbcDaConstrucao\AutenticacaoPackage\Services;
 
 use AbcDaConstrucao\AutenticacaoPackage\Facades\Http;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Config;
+use Illuminate\Support\Facades\Session;
 
 class JWTService
 {
+    protected $hasSession;
+
+    public function __construct(bool $hasSession = false)
+    {
+        $this->hasSession = $hasSession;
+    }
+
     /**
      * @return mixed
      */
     public function getToken()
     {
-        return Cache::get(Config::get('sag.session.token'));
+        if ($this->hasSession) {
+            return Session::get(Config::get('sag.session.token'));
+        }
+
+        return null;
     }
 
     /**
@@ -21,7 +32,11 @@ class JWTService
      */
     public function getTokenType()
     {
-        return Cache::get(Config::get('sag.session.token_type'));
+        if ($this->hasSession) {
+            return Session::get(Config::get('sag.session.token_type'));
+        }
+
+        return null;
     }
 
     /**
@@ -29,7 +44,11 @@ class JWTService
      */
     public function getTokenValidade()
     {
-        return Cache::get(Config::get('sag.session.token_validate'));
+        if ($this->hasSession) {
+            return Session::get(Config::get('sag.session.token_validate'));
+        }
+
+        return null;
     }
 
     /**
@@ -37,9 +56,11 @@ class JWTService
      */
     public function forgetToken()
     {
-        Cache::forget(Config::get('sag.session.token_type'));
-        Cache::forget(Config::get('sag.session.token_validate'));
-        Cache::forget(Config::get('sag.session.token'));
+        if ($this->hasSession) {
+            Session::forget(Config::get('sag.session.token_type'));
+            Session::forget(Config::get('sag.session.token_validate'));
+            Session::forget(Config::get('sag.session.token'));
+        }
     }
 
     /**

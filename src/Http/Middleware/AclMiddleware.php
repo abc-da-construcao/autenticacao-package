@@ -5,7 +5,6 @@ namespace AbcDaConstrucao\AutenticacaoPackage\Http\Middleware;
 use AbcDaConstrucao\AutenticacaoPackage\Facades\ACL;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Config;
 
 class AclMiddleware
 {
@@ -57,17 +56,7 @@ class AclMiddleware
      */
     protected function forbidden(Request $request)
     {
-        if (!$request->hasSession() && ($request->ajax() || $request->acceptsJson())) {
-            return response()->json(['message' => 'Ação não autorizada.'], 403);
-        }
-
-        $sessionKey = Config::get('sag.session.acl_error');
-
-        if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
-            return back()->with($sessionKey, 'Ação não autorizada.');
-        } else {
-            return redirect('/')->with($sessionKey, 'Ação não autorizada.');
-        }
+        return $this->responseHandle($request, 403, 'Ação não autorizada.');
     }
 
     /**
@@ -76,31 +65,40 @@ class AclMiddleware
      */
     protected function unauthorized(Request $request)
     {
-        if (!$request->hasSession() && ($request->ajax() || $request->acceptsJson())) {
-            return response()->json(['message' => 'Usuário não autenticado.'], 401);
-        }
-
-        $sessionKey = Config::get('sag.session.acl_error');
-
-        if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
-            return back()->with($sessionKey, 'Usuário não autenticado.');
-        } else {
-            return redirect('/')->with($sessionKey, 'Usuário não autenticado.');
-        }
+        return $this->responseHandle($request, 401, 'Usuário não autenticado.');
     }
 
+    /**
+     * @param Request $request
+     * @return mixed
+     */
     protected function notFound(Request $request)
     {
-        if (!$request->hasSession() && ($request->ajax() || $request->acceptsJson())) {
-            return response()->json(['message' => 'Url inválida.'], 404);
+        return $this->responseHandle($request, 404, 'Url inválida.');
+    }
+
+    /**
+     * @param Request $request
+     * @param int $statusCode
+     * @param string $msg
+     * @return mixed
+     */
+    protected function responseHandle(Request $request, int $statusCode, string $msg)
+    {
+        if (!$request->hasSession() && $request->acceptsJson()) {
+            return response()->json(['message' => $msg], $statusCode);
+        } elseif (($request->hasSession() && $this->isLumen()) && $request->acceptsJson()) {
+            return response()->json(['message' => $msg], $statusCode);
         }
 
-        $sessionKey = Config::get('sag.session.acl_error');
+        return abort($statusCode, $msg);
+    }
 
-        if ($request->hasSession() && $request->url() != $request->session()->previousUrl()) {
-            return back()->with($sessionKey, 'Url inválida.');
-        } else {
-            return redirect('/')->with($sessionKey, 'Url inválida.');
-        }
+    /**
+     * @return bool
+     */
+    protected function isLumen()
+    {
+        return class_exists('Laravel\Lumen\Application');
     }
 }

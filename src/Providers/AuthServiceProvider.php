@@ -55,23 +55,23 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->singleton(HttpClientService::class, function () {
-            return new HttpClientService();
+        $this->app->singleton(HttpClientService::class, function ($app) {
+            return new HttpClientService($app->has('session'));
         });
 
         $this->app->singleton(JWTService::class, function ($app) {
-            return new JWTService();
+            return new JWTService($app->has('session'));
         });
 
-        $this->app->singleton(AclService::class, function ($app) {
-            return new AclService($app);
+        $this->app->singleton(AclService::class, function () {
+            return new AclService();
         });
 
-        $this->app->singleton(AclMiddleware::class, function ($app) {
+        $this->app->singleton(AclMiddleware::class, function () {
             return new AclMiddleware();
         });
 
-        $this->app->singleton(SynchronizeRoutesCommand::class, function ($app) {
+        $this->app->singleton(SynchronizeRoutesCommand::class, function () {
             return new SynchronizeRoutesCommand();
         });
     }
