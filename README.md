@@ -255,7 +255,7 @@ $router->post('/login', function (Request $request) {
 
 **Exemplo em Frontend Laravel/Lumen** <br>
 
-O método `Http::loginRequest()` também salva o token em cache,
+O método `Http::loginRequest()` também salva o token em sessão caso exista a classe `Illuminate\Session\SessionManager`,
 facilitando o manuseio do mesmo e mantendo o usuário logado enquanto o token for válido.
  
 ```PHP
@@ -282,11 +282,11 @@ Posteriormente poderá acessar o token e passar nas requisições seguintes para
 
 ```PHP
 use Illuminate\Support\Facades\Config;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Session;
 
-$token = Cache::get(Config::get('sag.session.token'));
-$tokenType = Cache::get(Config::get('sag.session.token_type'));
-$tokenValidate = Cache::get(Config::get('sag.session.token_validate'));
+$token = Session::get(Config::get('sag.session.token'));
+$tokenType = Session::get(Config::get('sag.session.token_type'));
+$tokenValidate = Session::get(Config::get('sag.session.token_validate'));
 ```
 
 <br>
