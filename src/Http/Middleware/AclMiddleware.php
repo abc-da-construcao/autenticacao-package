@@ -86,9 +86,9 @@ class AclMiddleware
     protected function responseHandle(Request $request, int $statusCode, string $msg)
     {
         if (!$request->hasSession() && $request->acceptsJson()) {
-            return response()->json(['message' => $msg], $statusCode);
+            return response()->json(['code' => $statusCode, 'message' => $msg], $statusCode);
         } elseif (($request->hasSession() && $this->isLumen()) && $request->acceptsJson()) {
-            return response()->json(['message' => $msg], $statusCode);
+            return response()->json(['code' => $statusCode, 'message' => $msg], $statusCode);
         }
 
         return abort($statusCode, $msg);
