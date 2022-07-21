@@ -22,16 +22,12 @@ return [
         'token_type' => 'token_type',
         'token_validate' => 'token_validate',
         'token' => 'token',
-
-        // Chave de sessão contendo a mensagem de não autorizado.
-        // https://laravel.com/docs/8.x/session#flash-data
-        'acl_error' => 'acl_error',
     ],
 
     /*
      * Configurações de requisição para API de Autorização.
     */
-    'base_url' => env('SAG_URL', 'https://dev-backend-sag.devabc.com.br/api/'),
+    'base_url' => env('SAG_URL', 'https://sag-backend.digitalabc.com.br/api/'),
     'connect_timeout' => 10,
     'timeout' => 30,
 ];
