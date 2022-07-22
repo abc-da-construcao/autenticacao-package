@@ -36,7 +36,15 @@ class AclService
                 'uri' => $route->uri,
                 'name' => $route->name,
             ];
-            $map[$index]->public = count(preg_grep("/auth/", $route->action['middleware'])) === 0;
+            $authMiddlewareArray = preg_grep("/auth/", $route->action['middleware']);
+            $map[$index]->public = count($authMiddlewareArray) === 0;
+            $map[$index]->guard = null;
+
+            if (!empty($authMiddlewareArray)) {
+                $array = explode(':', $authMiddlewareArray[array_key_first($authMiddlewareArray)]);
+                $map[$index]->guard = $array[1];
+            }
+
             $index++;
         }
 
