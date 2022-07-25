@@ -42,7 +42,7 @@ class AclService
 
             if (!empty($authMiddlewareArray)) {
                 $array = explode(':', $authMiddlewareArray[array_key_first($authMiddlewareArray)]);
-                $map[$index]->guard = $array[1];
+                $map[$index]->guard = $array[1] ?? Config::get("auth.defaults.guard");
             }
 
             $index++;
